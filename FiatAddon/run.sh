@@ -1,9 +1,14 @@
 #!/usr/bin/with-contenv bashio
 
-export FiatUconnect_MqttUser=$(bashio::services "mqtt" "username")
-export FiatUconnect_MqttPw=$(bashio::services "mqtt" "password")
-export FiatUconnect_MqttServer=$(bashio::services "mqtt" "host")
-export FiatUconnect_MqttPort=$(bashio::services "mqtt" "port")
+export FiatUconnect_MqttUser=$(bashio::config 'OverrideMqttUser')
+export FiatUconnect_MqttPw=$(bashio::config 'OverrideMqttPw')
+export FiatUconnect_MqttServer=$(bashio::config 'OverrideMqttServer')
+export FiatUconnect_MqttPort=$(bashio::config 'OverrideMqttPort')
+  
+test "$FiatUconnect_MqttUser" = "null" && export FiatUconnect_MqttUser=$(bashio::services "mqtt" "username")
+test "$FiatUconnect_MqttPw" = "null" && export FiatUconnect_MqttPw=$(bashio::services "mqtt" "password")
+test "$FiatUconnect_MqttServer" = "null" && export FiatUconnect_MqttServer=$(bashio::services "mqtt" "host")
+test "$FiatUconnect_MqttPort" = "null" && export FiatUconnect_MqttPort=$(bashio::services "mqtt" "port")
   
 export FiatUconnect_StartDelaySeconds=$(bashio::config 'StartDelaySeconds')
 export FiatUconnect_SupervisorToken=$SUPERVISOR_TOKEN
