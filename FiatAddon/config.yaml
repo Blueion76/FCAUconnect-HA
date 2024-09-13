@@ -36,6 +36,10 @@ schema:
   Debug: bool
   AutoDeepRefresh: bool
   AutoDeepInterval: int
+  OverrideMqttUser: str?
+  OverrideMqttPw: password?
+  OverrideMqttServer: str?
+  OverrideMqttPort: int?
   StartDelaySeconds: int?
 arch:
   - amd64
