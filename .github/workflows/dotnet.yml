@@ -33,7 +33,7 @@ jobs:
       uses: docker/login-action@v2.0.0
       with:
         registry: ghcr.io
-        username: ${{ github.repository_owner }}
+        username: altrdev #${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: create_image
       uses: home-assistant/builder@master
