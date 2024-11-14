@@ -264,7 +264,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FiatClient
         }
     });
 
-    var unlocktrunkButton = new HaButton(mqttClient, "LockTrunk", haDevice, async button =>
+    var unlocktrunkButton = new HaButton(mqttClient, "UnLockTrunk", haDevice, async button =>
     {
         if (await TrySendCommand(fiatClient, FiatCommand.ROTRUNKUNLOCK, vehicle.Vin))
         {
