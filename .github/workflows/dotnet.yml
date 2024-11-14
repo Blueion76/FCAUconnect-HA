@@ -1,0 +1,43 @@
+name: .NET
+
+on:
+  workflow_dispatch:
+  push:
+    branches: 
+      - master
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - arch: "armv7"
+            rid: "linux-musl-arm"
+          - arch: "amd64"
+            rid: "linux-musl-x64"
+    runs-on: ubuntu-latest
+    permissions: 
+      packages: write
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: setup
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+    - name: build_release
+      run: |
+        cd FiatAddon/FiatClient
+        dotnet publish -r ${{ matrix.rid }} --configuration Release --self-contained -o build/
+    - name: docker_login
+      uses: docker/login-action@v2.0.0
+      with:
+        registry: ghcr.io
+        username: altrdev #${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: create_image
+      uses: home-assistant/builder@master
+      with:
+        args: |
+          --${{ matrix.arch }} \
+          --target FiatAddon
