@@ -194,15 +194,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FiatClient
 
     var lightsButton = new HaButton(mqttClient, "Light", haDevice, async button =>
     {
-        if (await TrySendCommand(fiatClient, FiatCommand.ROLIGHTS, vehicle.Vin))
-        {
-            forceLoopResetEvent.Set();
-        }
-    });
-
-    var chargeNowButton = new HaButton(mqttClient, "ChargeNOW", haDevice, async button =>
-    {
-        if (await TrySendCommand(fiatClient, FiatCommand.CNOW, vehicle.Vin))
+        if (await TrySendCommand(fiatClient, FiatCommand.HBLF, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
@@ -212,6 +204,22 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FiatClient
     var hvacButton = new HaButton(mqttClient, "HVAC", haDevice, async button =>
     {
         if (await TrySendCommand(fiatClient, FiatCommand.ROPRECOND, vehicle.Vin))
+        {
+            forceLoopResetEvent.Set();
+        }
+    });
+
+    var startengineButton = new HaButton(mqttClient, "StartEngine", haDevice, async button =>
+    {
+        if (await TrySendCommand(fiatClient, FiatCommand.REON, vehicle.Vin))
+        {
+            forceLoopResetEvent.Set();
+        }
+    });
+
+    var stopengineButton = new HaButton(mqttClient, "StopEngine", haDevice, async button =>
+    {
+        if (await TrySendCommand(fiatClient, FiatCommand.REOFF, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
@@ -239,8 +247,32 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FiatClient
         Log.Information($"Force Fetch Now");
         await Task.Run(() => forceLoopResetEvent.Set());
     });
+  
+    var suppressalarmButton = new HaButton(mqttClient, "SuppressAlarm", haDevice, async button =>
+    {
+        if (await TrySendCommand(fiatClient, FiatCommand.TA, vehicle.Vin))
+        {
+            forceLoopResetEvent.Set();
+        }
+    });
+  
+    var locktrunkButton = new HaButton(mqttClient, "LockTrunk", haDevice, async button =>
+    {
+        if (await TrySendCommand(fiatClient, FiatCommand.ROTRUNKLOCK, vehicle.Vin))
+        {
+            forceLoopResetEvent.Set();
+        }
+    });
 
-    var haEntities = new HaEntity[] { hvacButton, chargeNowButton, deepRefreshButton, lightsButton, updateLocationButton, lockButton, unLockButton, fetchNowButton };
+    var unlocktrunkButton = new HaButton(mqttClient, "LockTrunk", haDevice, async button =>
+    {
+        if (await TrySendCommand(fiatClient, FiatCommand.ROTRUNKUNLOCK, vehicle.Vin))
+        {
+            forceLoopResetEvent.Set();
+        }
+    });
+
+    var haEntities = new HaEntity[] { hvacButton, startengineButton, stopengineButton, deepRefreshButton, lightsButton, updateLocationButton, lockButton, unLockButton, fetchNowButton, suppressalarmButton, locktrunkButton, unlocktrunkButton };
 
     Log.Debug("Announce haEntities : {0}", haEntities.Dump());
 
