@@ -1,11 +1,11 @@
 name: "FiatUconnect"
-url: "https://github.com/altrdev/FiatUconnect"
-description: "Connect your FIAT (uconnect) car to Home Assistant. 🚗"
+url: "https://github.com/Blueion76/FiatUconnect"
+description: "Connect your FIAT (uconnect) car to Home Assistant. 🚗 Fork by Blueion"
 services:
     - "mqtt:want"
-version: "12.1.9"
+version: "1.0"
 homeassistant_api: true
-image: "ghcr.io/altrdev/image-{arch}-fiat-uconnect"
+image: "ghcr.io/blueion76/image-{arch}-fiat-uconnect"
 slug: "fiat_uconnect"
 init: false
 discovery: 
