@@ -10,6 +10,6 @@ RUN chmod a+x /run.sh
 
 COPY FiatClient/build/ /build/.
 
-LABEL org.opencontainers.image.source https://github.com/altrdev/FiatUconnect
+LABEL org.opencontainers.image.source https://github.com/Blueion76/FiatUconnect
 
 CMD [ "/run.sh" ]
