@@ -107,9 +107,9 @@ public class HaDeviceTracker : HaEntity
     public HaDeviceTracker(SimpleMqttClient mqttClient, string name, HaDevice haDevice)
       : base(mqttClient, name, haDevice)
     {
-        _stateTopic = $"homeassistant/sensor/fiat_uconnect/{_id}/state";
-        _configTopic = $"homeassistant/sensor/fiat_uconnect/{_id}/config";
-        _attributesTopic = $"homeassistant/sensor/fiat_uconnect/{_id}/attributes";
+        _stateTopic = $"homeassistant/sensor/FCA_uconnect/{_id}/state";
+        _configTopic = $"homeassistant/sensor/FCA_uconnect/{_id}/config";
+        _attributesTopic = $"homeassistant/sensor/FCA_uconnect/{_id}/attributes";
     }
 
     public override async Task PublishState()
@@ -166,8 +166,8 @@ public class HaSensor : HaEntity
 
         var typeSensor = $"{(_binary ? "binary_sensor" : "sensor")}";
 
-        _stateTopic = $"homeassistant/{typeSensor}/fiat_uconnect/{_id}/state";
-        _configTopic = $"homeassistant/{typeSensor}/fiat_uconnect/{_id}/config";
+        _stateTopic = $"homeassistant/{typeSensor}/FCA_uconnect/{_id}/state";
+        _configTopic = $"homeassistant/{typeSensor}/FCA_uconnect/{_id}/config";
     }
 
     public override async Task PublishState()
@@ -217,8 +217,8 @@ public class HaButton : HaEntity
     public HaButton(SimpleMqttClient mqttClient, string name, HaDevice haDevice, Func<HaButton, Task> onPressedCommand)
       : base(mqttClient, name, haDevice)
     {
-        _commandTopic = $"homeassistant/button/fiat_uconnect/{_id}/set";
-        _configTopic = $"homeassistant/button/fiat_uconnect/{_id}/config";
+        _commandTopic = $"homeassistant/button/FCA_uconnect/{_id}/set";
+        _configTopic = $"homeassistant/button/FCA_uconnect/{_id}/config";
 
         _ = mqttClient.Sub(_commandTopic, async _ =>
         {
@@ -268,9 +268,9 @@ public class HaSwitch : HaEntity
     public HaSwitch(SimpleMqttClient mqttClient, string name, HaDevice haDevice, Func<HaSwitch, Task> onSwitchCommand)
       : base(mqttClient, name, haDevice)
     {
-        _commandTopic = $"homeassistant/switch/fiat_uconnect/{_id}/set";
-        _stateTopic = $"homeassistant/switch/fiat_uconnect/{_id}/state";
-        _configTopic = $"homeassistant/switch/fiat_uconnect/{_id}/config";
+        _commandTopic = $"homeassistant/switch/FCA_uconnect/{_id}/set";
+        _stateTopic = $"homeassistant/switch/FCA_uconnect/{_id}/state";
+        _configTopic = $"homeassistant/switch/FCA_uconnect/{_id}/config";
 
         _ = mqttClient.Sub(_commandTopic, async message =>
         {
