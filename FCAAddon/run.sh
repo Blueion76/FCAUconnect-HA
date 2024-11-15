@@ -13,9 +13,9 @@ test "$FCAUconnect_MqttPort" = "null" && export FCAUconnect_MqttPort=$(bashio::s
 export FCAUconnect_StartDelaySeconds=$(bashio::config 'StartDelaySeconds')
 export FCAUconnect_SupervisorToken=$SUPERVISOR_TOKEN
   
-export FCAUconnect_FiatUser=$(bashio::config 'FiatUser')
-export FCAUconnect_FiatPw=$(bashio::config 'FiatPw')
-export FCAUconnect_FiatPin=$(bashio::config 'FiatPin')
+export FCAUconnect_FCAUser=$(bashio::config 'FCAUser')
+export FCAUconnect_FCAPw=$(bashio::config 'FCAPw')
+export FCAUconnect_FCAPin=$(bashio::config 'FCAPin')
 
 export FCAUconnect_Brand=$(bashio::config 'Brand')
 export FCAUconnect_Region=$(bashio::config 'Region')
