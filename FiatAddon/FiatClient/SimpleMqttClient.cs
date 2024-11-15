@@ -4,7 +4,7 @@ using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Protocol;
 using Serilog;
 
-namespace FiatUconnect;
+namespace FCAUconnect;
 
 public class SimpleMqttClient
 {
