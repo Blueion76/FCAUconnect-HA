@@ -1,0 +1,48 @@
+---
+configuration:
+  FCAUser:
+    name: Login user
+    description: Your FCA uconnect user.
+  FCAPw:
+    name: Password
+    description: Your FCA uconnect password.
+  FCAPin:
+    name: Pin
+    description: Your PIN. Used for sending commands to the car.
+  CarUnknownLocation:
+    name: Car unknown location status
+    description: Car location sensor status if car is not in a known zone.
+  StartDelaySeconds:
+    name: Start delay in seconds
+    description: Delay start of addon. Useful if you want to wait for other addons to start first (like slow mqtt startup).
+  Brand:
+    name: Brand
+    description: Jeep and Ram support is new. Dodge and AlfraRomeo is experimental it may not work.
+  Region:
+    name: Region
+    description: Some cars need the correct region to work.
+  RefreshInterval:
+    name: Refresh interval
+    description: Fetch new data from api every X minutes.
+  Debug:
+    name: Debug
+    description: Enable debug logging. It will dump many information to the log including session tokens and sensitive information.
+  AutoRefreshBattery:
+    name: Force refresh battery status
+    description: Automatic update battery status every refresh interval. This will consume more battery power.
+  AutoRefreshLocation:
+    name: Force refresh location
+    description: Automatic update location every refresh interval. This will consume more battery power.
+  OverrideMqttUser:
+    name: Override mqtt user
+    description: Override mqtt settings if you are using an external broker. you do not need this if you are using the official home assistant mqtt addon.
+  OverrideMqttPw:
+    name: Override mqtt pw
+    description: Override mqtt settings if you are using an external broker. you do not need this if you are using the official home assistant mqtt addon.
+  OverrideMqttServer:
+    name: Override mqtt server.
+    description: Override mqtt settings if you are using an external broker. you do not need this if you are using the official home assistant mqtt addon.
+  OverrideMqttPort:
+    name: Override mqtt port.
+    description: Override mqtt settings if you are using an external broker. you do not need this if you are using the official home assistant mqtt addon.
+
