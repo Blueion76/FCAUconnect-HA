@@ -315,6 +315,13 @@ async Task<IEnumerable<HaEntity>> GetHaEntities(HaRestApi haClient, SimpleMqttCl
                deviceClass = "duration";
                unit = "min";
            }
+         
+           if (detail.Key.Contains(ignitionStatus, StringComparison.InvariantCultureIgnoreCase))
+           {
+               binary = true; // Ignition is a binary state: ON or OFF
+               deviceClass = "power"; 
+               value = detail.Value.Equals("ON", StringComparison.InvariantCultureIgnoreCase) ? "True" : "False"; // Ignition status
+           }
 
            if (detail.Key.EndsWith("chargingstatus", StringComparison.InvariantCultureIgnoreCase))
            {
@@ -424,6 +431,14 @@ async Task<IEnumerable<HaEntity>> GetHaEntities(HaRestApi haClient, SimpleMqttCl
     };
 
     haEntities.Add(tracker);
+
+    var ignitionSensor = new HaSensor(mqttClient, "Ignition_Status", haDevice, true)
+    {
+        DeviceClass = "problem", // "problem" could indicate an issue if the car isn't running, adjust accordingly
+        Value = haEntities.FirstOrDefault(s => s.Name.Equals(ignitionStatus, StringComparison.InvariantCultureIgnoreCase))?.Value ?? "False"
+    };
+    haEntities.Add(ignitionSensor); // Add the ignition sensor to the list
+
 
     var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice, false)
     {
