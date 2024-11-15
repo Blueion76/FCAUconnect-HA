@@ -286,6 +286,7 @@ async Task<IEnumerable<HaEntity>> GetHaEntities(HaRestApi haClient, SimpleMqttCl
     bool charging = false;
     string charginglevel = "battery_timetofullychargel2";
     string batteryPluginstatus = "battery_pluginstatus";
+    string ignitionStatus = "ignitionstatus";
     
     DateTime refChargeEndTime = DateTime.Now;
 
@@ -303,6 +304,7 @@ async Task<IEnumerable<HaEntity>> GetHaEntities(HaRestApi haClient, SimpleMqttCl
              || detail.Key.Contains("chargetofull", StringComparison.InvariantCultureIgnoreCase)
              || detail.Key.Contains("enablescheduletype", StringComparison.InvariantCultureIgnoreCase)
              || detail.Key.Contains("repeatschedule", StringComparison.InvariantCultureIgnoreCase)
+             || detail.Key.Contains("ignitionstatus", StringComparison.InvariantCultureIgnoreCase)
              )
            {
                binary = true;
