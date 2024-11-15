@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 
-namespace FiatUconnect.HA;
+namespace FCAUconnect.HA;
 
 public class HaRestApiEntityState
 {
