@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace FiatUconnect;
+namespace FCAUconnect;
 
 public record AppConfig
 {
