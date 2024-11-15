@@ -17,7 +17,7 @@ configuration:
     description: Delay start of addon. Useful if you want to wait for other addons to start first (like slow mqtt startup).
   Brand:
     name: Brand
-    description: Jeep and Ram support is new. Dodge and AlfraRomeo is experimental it may not work.
+    description: Jeep and Ram support is new. Dodge and AlfaRomeo is experimental - it may not work.
   Region:
     name: Region
     description: Some cars need the correct region to work.
