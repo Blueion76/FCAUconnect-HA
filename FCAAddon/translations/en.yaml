@@ -2,10 +2,10 @@
 configuration:
   FCAUser:
     name: Login user
-    description: Your FCA uconnect user.
+    description: Your FCA Uconnect user.
   FCAPw:
     name: Password
-    description: Your FCA uconnect password.
+    description: Your FCA Uconnect password.
   FCAPin:
     name: Pin
     description: Your PIN. Used for sending commands to the car.
