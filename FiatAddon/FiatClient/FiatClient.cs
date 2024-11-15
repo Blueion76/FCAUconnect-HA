@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 
-namespace FiatUconnect;
+namespace FCAUconnect;
 
 public enum FcaBrand
 {
