@@ -6,9 +6,9 @@ namespace FCAUconnect;
 
 public record AppConfig
 {
-  [Required(AllowEmptyStrings = false)] public string FiatUser { get; set; } = null!;
-  [Required(AllowEmptyStrings = false)] public string FiatPw { get; set; } = null!;
-  public string? FiatPin { get; set; }
+  [Required(AllowEmptyStrings = false)] public string FCAUser { get; set; } = null!;
+  [Required(AllowEmptyStrings = false)] public string FCAPw { get; set; } = null!;
+  public string? FCAPin { get; set; }
   [Required(AllowEmptyStrings = false)] public string MqttServer { get; set; } = null!;
   [Range(1, 65536)] public int MqttPort { get; set; } = 1883;
   public string MqttUser { get; set; } = "";
@@ -33,15 +33,15 @@ public record AppConfig
 
   public string ToStringWithoutSecrets()
   {
-    var user = this.FiatUser[0..2] + new string('*', this.FiatUser[2..].Length);
+    var user = this.FCAUser[0..2] + new string('*', this.FCAUser[2..].Length);
 
     var tmp = this with
     {
-      FiatUser = user,
+      FCAUser = user,
       SupervisorToken = new string('*', this.SupervisorToken.Length),
-      FiatPw = new string('*', this.FiatPw.Length),
+      FCAPw = new string('*', this.FCAPw.Length),
       MqttPw = new string('*', this.MqttPw.Length),
-      FiatPin = new string('*', this.FiatPin?.Length ?? 0),
+      FCAPin = new string('*', this.FCAPin?.Length ?? 0),
     };
 
     return JsonConvert.SerializeObject(tmp, Formatting.Indented, new StringEnumConverter());
@@ -49,6 +49,6 @@ public record AppConfig
   
   public bool IsPinSet()
   {
-    return !string.IsNullOrWhiteSpace(this.FiatPin);
+    return !string.IsNullOrWhiteSpace(this.FCAPin);
   }
 }
