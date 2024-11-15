@@ -398,10 +398,10 @@ async Task<IEnumerable<HaEntity>> GetHaEntities(HaRestApi haClient, SimpleMqttCl
     };
 
     haEntities.Add(trackerTimeStamp);
-
+  
+    Log.Debug("Announce haEntities : {0}", haEntities.Dump())
+      
     return haEntities;
-}
-
 }
 
 DateTime GetLocalTime(long timeStamp)
