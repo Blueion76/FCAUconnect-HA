@@ -2,19 +2,19 @@
 configuration:
   FCAUser:
     name: Login user
-    description: Your FCA Uconnect user.
+    description: Your FCA Uconnect username/email.
   FCAPw:
     name: Password
     description: Your FCA Uconnect password.
   FCAPin:
     name: Pin
-    description: Your PIN. Used for sending commands to the car.
+    description: Your FCA PIN. Used for sending commands to the car.
   CarUnknownLocation:
     name: Car unknown location status
     description: Car location sensor status if car is not in a known zone.
   StartDelaySeconds:
     name: Start delay in seconds
-    description: Delay start of addon. Useful if you want to wait for other addons to start first (like slow mqtt startup).
+    description: Delay start of addon. Useful if you want to wait for other addons to start first (like slow MQTT startup).
   Brand:
     name: Brand
     description: Jeep and Ram support is new. Dodge and AlfaRomeo is experimental - it may not work.
@@ -26,23 +26,23 @@ configuration:
     description: Fetch new data from api every X minutes.
   Debug:
     name: Debug
-    description: Enable debug logging. It will dump many information to the log including session tokens and sensitive information.
+    description: Enable debug logging. It will dump a lot of information to the log including session tokens and sensitive information.
   AutoRefreshBattery:
     name: Force refresh battery status
-    description: Automatic update battery status every refresh interval. This will consume more battery power.
+    description: Automatic battery status update every refresh interval. This will consume more battery power.
   AutoRefreshLocation:
     name: Force refresh location
-    description: Automatic update location every refresh interval. This will consume more battery power.
+    description: Automatic location update every refresh interval. This will consume more battery power.
   OverrideMqttUser:
-    name: Override mqtt user
-    description: Override mqtt settings if you are using an external broker. you do not need this if you are using the official home assistant mqtt addon.
+    name: Override MQTT User
+    description: Override MQTT settings if you are using an external broker. You do not need this if you are using the official Home Assistant MQTT addon.
   OverrideMqttPw:
-    name: Override mqtt pw
-    description: Override mqtt settings if you are using an external broker. you do not need this if you are using the official home assistant mqtt addon.
+    name: Override MQTT PW
+    description: Override MQTT Password if you are using an external broker. You do not need this if you are using the official Home Assistant MQTT addon.
   OverrideMqttServer:
-    name: Override mqtt server.
-    description: Override mqtt settings if you are using an external broker. you do not need this if you are using the official home assistant mqtt addon.
+    name: Override MQTT server
+    description: Override MQTT Server URL if you are using an external broker. You do not need this if you are using the official Home Assistant MQTT addon.
   OverrideMqttPort:
-    name: Override mqtt port.
-    description: Override mqtt settings if you are using an external broker. you do not need this if you are using the official home assistant mqtt addon.
+    name: Override MQTT port.
+    description: Override MQTT  settings if you are using an external broker. You do not need this if you are using the official Home Assistant MQTT addon.
 
