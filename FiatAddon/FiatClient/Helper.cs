@@ -7,7 +7,7 @@ using Flurl.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace FiatUconnect;
+namespace FCAUconnect;
 
 public static class Helper
 {
