@@ -6,16 +6,16 @@ Connect your FIAT, Jeep, Ram, Dodge, AlfaRomeo car 🚗 or truck 🚚 to Home As
 
 ## Car Brands
 
-Fiat: Works ✅
-Jeep: Works ✅
-Ram: Experimental ⚠️
-Dodge: Unknown ⛔
-AlfaRomeo: Unknown ⛔
+- Fiat: Works ✅
+- Jeep: Works ✅
+- Ram: Experimental ⚠️
+- Dodge: Unknown ⛔
+- AlfaRomeo: Unknown ⛔
 
 
 ## Tested Vehicles
 
-2024 Jeep Wagoneer L
+- 2024 Jeep Wagoneer L
 
 ## Prerequisites 📃
 
