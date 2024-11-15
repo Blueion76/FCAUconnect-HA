@@ -281,140 +281,107 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FiatClient
 
 async Task<IEnumerable<HaEntity>> GetHaEntities(HaRestApi haClient, SimpleMqttClient mqttClient, Vehicle vehicle, HaDevice haDevice)
 {
-     var compactDetails = vehicle.Details.Compact("");
+    var compactDetails = vehicle.Details.Compact("");
 
     bool charging = false;
     string charginglevel = "battery_timetofullychargel2";
     string batteryPluginstatus = "battery_pluginstatus";
-    string ignitionStatus = "ignitionstatus";
-    
+    string ignitionStatus = "ignitionstatus"; // The key for ignition status
     DateTime refChargeEndTime = DateTime.Now;
 
     List<HaEntity> haEntities = compactDetails.Select(detail =>
-       {
-
-           bool binary = false;
-           string deviceClass = "";
-           string unit = "";
-           string value = detail.Value;
-
-           if (detail.Key.Contains("scheduleddays", StringComparison.InvariantCultureIgnoreCase)
-             || detail.Key.Contains("pluginstatus", StringComparison.InvariantCultureIgnoreCase)
-             || detail.Key.Contains("cabinpriority", StringComparison.InvariantCultureIgnoreCase)
-             || detail.Key.Contains("chargetofull", StringComparison.InvariantCultureIgnoreCase)
-             || detail.Key.Contains("enablescheduletype", StringComparison.InvariantCultureIgnoreCase)
-             || detail.Key.Contains("repeatschedule", StringComparison.InvariantCultureIgnoreCase)
-             || detail.Key.Contains("ignitionstatus", StringComparison.InvariantCultureIgnoreCase)
-             )
-           {
-               binary = true;
-           }
-
-           if (detail.Key.Contains("battery_timetofullycharge", StringComparison.InvariantCultureIgnoreCase))
-           {
-               deviceClass = "duration";
-               unit = "min";
-           }
-
-           if (detail.Key.EndsWith("chargingstatus", StringComparison.InvariantCultureIgnoreCase))
-           {
-               binary = true;
-               deviceClass = "battery_charging";
-               if (detail.Value == "CHARGING")
-               {
-                   value = "True";
-                   charging = true;
-               }
-               else
-               {
-                   value = "False";
-                   charging = false;
-               }
-
-           }
-
-           if (detail.Key.EndsWith("evinfo_battery_charginglevel", StringComparison.InvariantCultureIgnoreCase))
-           {
-               charginglevel = $"battery_timetofullychargel{detail.Value.Last()}";
-           }
-
-           if (detail.Key.EndsWith("battery_stateofcharge", StringComparison.InvariantCultureIgnoreCase))
-           {
-               deviceClass = "battery";
-               unit = "%";
-           }
-
-           if (detail.Key.EndsWith("evinfo_timestamp", StringComparison.InvariantCultureIgnoreCase))
-           {
-               refChargeEndTime = GetLocalTime(Convert.ToInt64(detail.Value));
-           }
-
-           if (detail.Key.EndsWith("_timestamp", StringComparison.InvariantCultureIgnoreCase))
-           {
-               value = GetLocalTime(Convert.ToInt64(detail.Value)).ToString("dd/MM HH:mm:ss");
-               //deviceClass = "duration";
-           }
-
-           var sensor = new HaSensor(mqttClient, detail.Key, haDevice, binary)
-           {
-               DeviceClass = deviceClass,
-               Unit = unit,
-               Value = value,
-           };
-
-           return sensor as HaEntity;
-       }).ToList();
-
-
-    var plugged = haEntities.OfType<HaSensor>().Any(s => s.Name.EndsWith(batteryPluginstatus, StringComparison.InvariantCultureIgnoreCase) && s.Value.Equals("True", StringComparison.InvariantCultureIgnoreCase));
-    if (plugged)
     {
-        if (!vinPlugged.Contains(vehicle.Vin))
+        bool binary = false;
+        string deviceClass = "";
+        string unit = "";
+        string value = detail.Value;
+
+        // Handling different vehicle details
+        if (detail.Key.Contains("scheduleddays", StringComparison.InvariantCultureIgnoreCase)
+            || detail.Key.Contains("pluginstatus", StringComparison.InvariantCultureIgnoreCase)
+            || detail.Key.Contains("cabinpriority", StringComparison.InvariantCultureIgnoreCase)
+            || detail.Key.Contains("chargetofull", StringComparison.InvariantCultureIgnoreCase)
+            || detail.Key.Contains("enablescheduletype", StringComparison.InvariantCultureIgnoreCase)
+            || detail.Key.Contains("repeatschedule", StringComparison.InvariantCultureIgnoreCase)
+            || detail.Key.Contains("ignitionstatus", StringComparison.InvariantCultureIgnoreCase)) // Ignition status condition
         {
-            vinPlugged.Add(vehicle.Vin);
-        }
-    }
-    else
-    {
-        vinPlugged.Remove(vehicle.Vin);
-    } 
-
-    var textChargeDuration = "0";
-    var textChargeEndTime = "00:00";
-    if (charging)
-    {
-        if (!vinCharging.Contains(vehicle.Vin))
-        {
-            vinCharging.Add(vehicle.Vin);
-            forceLoopDeepEvent.Set();
+            binary = true;
         }
 
-        var chargeDuration = Convert.ToInt32(haEntities.OfType<HaSensor>().Single(s => s.Name.EndsWith(charginglevel, StringComparison.InvariantCultureIgnoreCase)).Value);
-        textChargeDuration = $"{chargeDuration / 60}:{$"{chargeDuration % 60}".PadLeft(2, '0')}";
-        textChargeEndTime = refChargeEndTime.AddMinutes(chargeDuration).ToString("H:mm");
-    }
-    else
-    {
-        vinCharging.Remove(vehicle.Vin);
-    }
+        // Handling ignition status - this will be a binary state (On/Off)
+        if (detail.Key.Equals(ignitionStatus, StringComparison.InvariantCultureIgnoreCase))
+        {
+            deviceClass = "switch"; // Ignition can be treated as a switch type
+            binary = true;
+            value = detail.Value == "ON" ? "True" : "False"; // Assuming the ignition status value is "ON" or "OFF"
+        }
 
-    haEntities.Add(new HaSensor(mqttClient, "Charge_Duration", haDevice, false)
-    {
-      //  DeviceClass = "duration",
-        Value = textChargeDuration,
-    });
+        if (detail.Key.Contains("battery_timetofullycharge", StringComparison.InvariantCultureIgnoreCase))
+        {
+            deviceClass = "duration";
+            unit = "min";
+        }
 
-    haEntities.Add(new HaSensor(mqttClient, "Charge_Endtime", haDevice, false)
-    {
-      //  DeviceClass = "duration",
-        Value = textChargeEndTime,
-    });
+        if (detail.Key.EndsWith("chargingstatus", StringComparison.InvariantCultureIgnoreCase))
+        {
+            binary = true;
+            deviceClass = "battery_charging";
+            if (detail.Value == "CHARGING")
+            {
+                value = "True";
+                charging = true;
+            }
+            else
+            {
+                value = "False";
+                charging = false;
+            }
+        }
 
+        // Other details (e.g., charge levels, timestamps, etc.)
+        if (detail.Key.EndsWith("evinfo_battery_charginglevel", StringComparison.InvariantCultureIgnoreCase))
+        {
+            charginglevel = $"battery_timetofullychargel{detail.Value.Last()}";
+        }
+
+        if (detail.Key.EndsWith("battery_stateofcharge", StringComparison.InvariantCultureIgnoreCase))
+        {
+            deviceClass = "battery";
+            unit = "%";
+        }
+
+        if (detail.Key.EndsWith("evinfo_timestamp", StringComparison.InvariantCultureIgnoreCase))
+        {
+            refChargeEndTime = GetLocalTime(Convert.ToInt64(detail.Value));
+        }
+
+        if (detail.Key.EndsWith("_timestamp", StringComparison.InvariantCultureIgnoreCase))
+        {
+            value = GetLocalTime(Convert.ToInt64(detail.Value)).ToString("dd/MM HH:mm:ss");
+        }
+
+        // Create a sensor for the vehicle detail
+        var sensor = new HaSensor(mqttClient, detail.Key, haDevice, binary)
+        {
+            DeviceClass = deviceClass,
+            Unit = unit,
+            Value = value,
+        };
+
+        return sensor as HaEntity;
+    }).ToList();
+
+    // Add ignition status to Home Assistant
+    var ignitionSensor = new HaSensor(mqttClient, ignitionStatus, haDevice, true)
+    {
+        DeviceClass = "switch", // This will treat the ignition status as a switch
+        Value = haEntities.FirstOrDefault(s => s.Name.Equals(ignitionStatus, StringComparison.InvariantCultureIgnoreCase))?.Value ?? "False"
+    };
+    haEntities.Add(ignitionSensor);
+
+    // Other vehicle-related updates (location, charging duration, etc.)
     var currentCarLocation = new Coordinate(vehicle.Location.Latitude, vehicle.Location.Longitude);
-
     var zones = await haClient.GetZonesAscending(currentCarLocation);
-
-    Log.Debug("Zones: {0}", zones.Dump());
 
     var tracker = new HaDeviceTracker(mqttClient, "Location", haDevice)
     {
@@ -427,15 +394,14 @@ async Task<IEnumerable<HaEntity>> GetHaEntities(HaRestApi haClient, SimpleMqttCl
 
     var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice, false)
     {
-        Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("dd/MM HH:mm:ss"),
-        //DeviceClass = "duration"
+        Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("dd/MM HH:mm:ss")
     };
 
     haEntities.Add(trackerTimeStamp);
 
-    Log.Debug("Announce haEntities : {0}", haEntities.Dump());
-
     return haEntities;
+}
+
 }
 
 DateTime GetLocalTime(long timeStamp)
