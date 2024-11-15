@@ -2,7 +2,7 @@
 
 source, credit and most code from https://github.com/wubbl0rz/FiatChamp
 
-Connect your FIAT, Jeep, Ram, Dodge, AlfaRomeo car 🚗 or truck 🚚 to Home Assistant. Needs a vehicle with valid subscription tied to Uconnect account.
+Connect your FIAT, Jeep, Ram, Dodge or AlfaRomeo car 🚗 or truck 🚚 to Home Assistant. Needs a vehicle with valid subscription tied to Uconnect account.
 
 ## Car Brands
 
