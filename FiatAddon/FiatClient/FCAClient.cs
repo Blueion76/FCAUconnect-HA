@@ -24,7 +24,7 @@ public enum FcaRegion
   US
 }
 
-public class FiatClient 
+public class FCAClient 
 {
   private readonly string _loginApiKey = "";
   private readonly string _apiKey= "";
@@ -47,7 +47,7 @@ public class FiatClient
 
   private (string userUid, ImmutableCredentials awsCredentials)? _loginInfo = null;
 
-  public FiatClient(string user, string password, FcaBrand brand = FcaBrand.Fiat, FcaRegion region = FcaRegion.Europe)
+  public FCAClient(string user, string password, FcaBrand brand = FcaBrand.Fiat, FcaRegion region = FcaRegion.Europe)
   {
     _user = user;
     _password = password;
