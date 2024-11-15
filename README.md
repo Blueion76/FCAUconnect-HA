@@ -1,6 +1,6 @@
 ![Uconnect Logo](https://www.driveuconnect.com/content/dam/uconnect/global/header/Uconnect-small.png)
 
-source , credit and all intellengency from https://github.com/wubbl0rz/FiatChamp
+source, credit and most code from https://github.com/wubbl0rz/FiatChamp
 
 Connect your FIAT, Jeep, Ram, Dodge, AlfaRomeo car 🚗 or truck 🚚 to Home Assistant. Needs a vehicle with enabled uconnect services and valid account.
 
@@ -23,7 +23,7 @@ Connect your FIAT, Jeep, Ram, Dodge, AlfaRomeo car 🚗 or truck 🚚 to Home As
 
 ![image](https://user-images.githubusercontent.com/30373916/196045271-44287d3f-93ba-49c0-a72f-0bc92042efbb.png)
 
-Make sure your car works with one of the following uconnect sites. Older vehicles that only uses mopar.com do not seem to work.
+Make sure your car works with one of the following Uconnect sites. Older vehicles that only uses mopar.com do not seem to work.
 
 - Fiat: https://myuconnect.fiat.com/
 - Jeep: https://myuconnect.jeep.com
@@ -33,13 +33,13 @@ Make sure your car works with one of the following uconnect sites. Older vehicle
 
 ## Features ✔️
 
-- Imports values like battery level 🔋, tyre pressure ‍💨, odometer ⏲ etc. into Home Assistant.
+- Imports values like battery level 🔋, tire pressure ‍💨, odometer ⏲ etc. into Home Assistant.
 - Multiple Brands: Fiat, Jeep, Ram, Dodge, AlfaRomeo
 - Supports multiple cars on the same account. 🚙🚗🚕
 - Location tracking.🌍
 - Home Assistant zones (home 🏠, work 🏦 etc.) support.
 - Uses the same data source as the official app 📱.
-- Remote commands (open doors 🚪, switch air conditioner 🧊 on , ...) are supported since version 2.0. Some commands may not work with all cars. Available commands are:
+- Remote commands (open doors 🚪, switch air conditioner 🧊 on , ...) Some commands may not work with all cars. Available commands are:
   - "UpdateLocation" (updates gps location of the car) 
   - "RefreshBatteryStatus" (refresh battery level %)
   - "DeepRefresh" (same as "RefreshBatteryStatus")
@@ -59,7 +59,7 @@ Make sure your car works with one of the following uconnect sites. Older vehicle
 
 ## What will NEVER work? ❌
 
-- Things the fiat api does not support. Like real time tracking or adjusting the music volume. Maybe they add some new features in the future. 
+- Things the FCA api does not support. Like real time tracking or adjusting the music volume.
 
 ## How to install 🛠️
 
@@ -84,7 +84,7 @@ At startup the Addon will automatically connect to your Home Assistant MQTT Brok
 
 - PIN is only needed if you want to send commands to your car. Its the same PIN used by the official app or website.
 - Use DEBUG carefully. It will dump many informations to the log including session tokens and sensitive informations.
-- Automatic refresh of location and battery level may drain your battery a bit more. The car have to wakeup some parts, read new values and sent them back. This will get executed every "Refresh interval" and at every command even if your car is not at home. __Recommendation:__  Use a Home Assistant automation instead. I have setup an automation that if the odometer has gone up the Wagoneer will update it's location/battery status.
-- Mqtt override can be used if you want to utilize an external mqtt broker. __You do not need this if you are using the official home assistant mqtt addon.__
+- Automatic refresh of location and battery level may drain your battery a bit more. The car have to wakeup some parts, read new values and sent them back. This will get executed every "Refresh interval" and at every command even if your car is not at home. __Recommendation:__  Use a Home Assistant automation instead. I have setup an automation that if the odometer has gone up the car will update it's location/battery status.
+- Mqtt override can be used if you want to utilize an external mqtt broker. __You do not need this if you are using the official Home Assistant mqtt addon.__
 
 <img src="https://raw.githubusercontent.com/Blueion76/FCAUconnect-HA/refs/heads/master/options.png" width="700px">
