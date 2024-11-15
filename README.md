@@ -55,7 +55,7 @@ Make sure your car works with one of the following uconnect sites. Older vehicle
 ## What doesn't work (yet)? ❌
 
 - Eco Reports (statistics). I could not find any API yet. The official app shows it so in theory it should be accessible.
-- Live Vehicle Engine Status. Some users report that you can find the engine status but I haven't been able to replicate this on my 2024 Wagoneer L.
+- Live Vehicle Status. Some users report that you can find the engine/lock status but I haven't been able to replicate this on my 2024 Wagoneer L.
 
 ## What will NEVER work? ❌
 
@@ -78,3 +78,11 @@ Short version:
 - Refresh Page. (F5)
 - Store should show this repo now and you can install the addon.
 
+## Options / Usage
+
+At startup the Addon will automatically connect to your Home Assistant MQTT Broker. You can configure your own MQTT server in the configuration.
+
+- PIN is only needed if you want to send commands to your car. Its the same PIN used by the official app or website.
+- Use DEBUG carefully. It will dump many informations to the log including session tokens and sensitive informations.
+- Automatic refresh of location and battery level may drain your battery a bit more. The car have to wakeup some parts, read new values and sent them back. This will get executed every "Refresh interval" and at every command even if your car is not at home. __Recommendation:__  Use a Home Assistant automation instead. I have setup an automation that if the odometer has gone up the Wagoneer will update it's location/battery status.
+- Mqtt override can be used if you want to utilize an external mqtt broker. __You do not need this if you are using the official home assistant mqtt addon.__
