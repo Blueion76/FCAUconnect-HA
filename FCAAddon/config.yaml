@@ -11,9 +11,9 @@ init: false
 discovery: 
     - "mqtt"
 options:
-  FiatUser: ""
-  FiatPw: ""
-  FiatPin: ""
+  FCAUser: ""
+  FCAPw: ""
+  FCAPin: ""
 
   Brand: "Jeep"
   Region: "US"
@@ -25,9 +25,9 @@ options:
 
   StartDelaySeconds: 2
 schema:
-  FiatUser: str
-  FiatPw: password
-  FiatPin: password?
+  FCAUser: str
+  FCAPw: password
+  FCAPin: password?
 
   Brand: list(Fiat|AlfaRomeo|Jeep|Debug)
   Region: list(Europe|US)
