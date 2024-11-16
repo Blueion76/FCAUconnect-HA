@@ -1,609 +1,397 @@
-using System.Text;
-using Amazon;
-using Amazon.CognitoIdentity;
-using Amazon.Runtime;
-using Flurl;
+using System.Collections.Concurrent;
+using System.Globalization;
+using Cocona;
+using CoordinateSharp;
+using FiatChamp;
+using FiatChamp.HA;
 using Flurl.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Serilog.Events;
 
-namespace FCAUconnect;
+var builder = CoconaApp.CreateBuilder();
 
-public interface IFiatClient
+builder.Configuration.AddEnvironmentVariables("FiatChamp_");
+
+//todo: integrate reports and events
+//todo: schedule turn charging off
+//todo: better handling of auto refresh battery and location ...
+
+builder.Services.AddOptions<AppConfig>()
+  .Bind(builder.Configuration)
+  .ValidateDataAnnotations()
+  .ValidateOnStart();
+
+var app = builder.Build();
+
+var persistentHaEntities = new ConcurrentDictionary<string, IEnumerable<HaEntity>>();
+var appConfig = builder.Configuration.Get<AppConfig>();
+var forceLoopResetEvent = new AutoResetEvent(false);
+var haClient = new HaRestApi(appConfig.HomeAssistantUrl, appConfig.SupervisorToken);
+
+Log.Logger = new LoggerConfiguration()
+  .MinimumLevel.Is(appConfig.Debug ? LogEventLevel.Debug : LogEventLevel.Information)
+  .WriteTo.Console()
+  .CreateLogger();
+
+Log.Information("Delay start for seconds: {0}", appConfig.StartDelaySeconds);
+await Task.Delay(TimeSpan.FromSeconds(appConfig.StartDelaySeconds));
+
+if (appConfig.Brand is FcaBrand.Ram or FcaBrand.Dodge or FcaBrand.AlfaRomeo)
 {
-  Task LoginAndKeepSessionAlive();
-  Task SendCommand(string vin, string command, string pin, string action);
-  Task<Vehicle[]> Fetch();
+  Log.Warning("{0} support is experimental.", appConfig.Brand);
 }
 
-public class FiatClientFake : IFiatClient
+await app.RunAsync(async (CoconaAppContext ctx) =>
 {
-  public Task LoginAndKeepSessionAlive()
-  {
-    return Task.CompletedTask;
-  }
+  Log.Information("{0}", appConfig.ToStringWithoutSecrets());
+  Log.Debug("{0}", appConfig.Dump());
 
-  public Task SendCommand(string vin, string command, string pin, string action)
-  {
-    return Task.CompletedTask;
-  }
+  IFiatClient fiatClient =
+    appConfig.UseFakeApi
+      ? new FiatClientFake()
+      : new FiatClient(appconfig.FCAUser, appconfig.FCAPw, appConfig.Brand, appConfig.Region);
 
-  public Task<Vehicle[]> Fetch()
+  var mqttClient = new SimpleMqttClient(appConfig.MqttServer,
+    appConfig.MqttPort,
+    appConfig.MqttUser,
+    appConfig.MqttPw,
+    appConfig.DevMode ? "FiatChampDEV" : "FiatChamp");
+
+  await mqttClient.Connect();
+
+  while (!ctx.CancellationToken.IsCancellationRequested)
   {
-    var vehicle = JsonConvert.DeserializeObject<Vehicle>("""
+    Log.Information("Now fetching new data...");
+
+    GC.Collect();
+
+    try
     {
-      "RegStatus": "COMPLETED_STAGE_3",
-      "Color": "BLUE",
-      "Year": 2022,
-      "TsoBodyCode": "",
-      "NavEnabledHu": false,
-      "Language": "",
-      "CustomerRegStatus": "Y",
-      "Radio": "",
-      "ActivationSource": "DEALER",
-      "Nickname": "KEKW",
-      "Vin": "LDM1SN7DHD7DHSHJ6753D",
-      "Company": "FCA",
-      "Model": 332,
-      "ModelDescription": "Neuer 500 3+1",
-      "TcuType": 2,
-      "Make": "FIAT",
-      "BrandCode": "12",
-      "SoldRegion": "EMEA"
-    }
-    """);
-    
-    vehicle.Details = JObject.Parse("""
-    {
-      "vehicleInfo": {
-        "totalRangeADA": null,
-        "odometer": {
-          "odometer": {
-            "value": "1234",
-            "unit": "km"
-          }
-        },
-        "daysToService": "null",
-        "fuel": {
-          "fuelAmountLevel": null,
-          "isFuelLevelLow": false,
-          "distanceToEmpty": {
-            "value": "150",
-            "unit": "km"
-          },
-          "fuelAmount": {
-            "value": "null",
-            "unit": "null"
-          }
-        },
-        "oilLevel": {
-          "oilLevel": null
-        },
-        "tyrePressure": [
+      await fiatClient.LoginAndKeepSessionAlive();
+
+      foreach (var vehicle in await fiatClient.Fetch())
+      {
+        Log.Information("FOUND CAR: {0}", vehicle.Vin);
+
+        if (appConfig.AutoRefreshBattery)
+        {
+          await TrySendCommand(fiatClient, FiatCommand.DEEPREFRESH, vehicle.Vin);
+        }
+
+        if (appConfig.AutoRefreshLocation)
+        {
+          await TrySendCommand(fiatClient, FiatCommand.VF, vehicle.Vin);
+        }
+
+        await Task.Delay(TimeSpan.FromSeconds(10), ctx.CancellationToken);
+
+        var vehicleName = string.IsNullOrEmpty(vehicle.Nickname) ? "Car" : vehicle.Nickname;
+        var suffix = appConfig.DevMode ? "DEV" : "";
+
+        var haDevice = new HaDevice()
+        {
+          Name = vehicleName + suffix,
+          Identifier = vehicle.Vin + suffix,
+          Manufacturer = vehicle.Make,
+          Model = vehicle.ModelDescription,
+          Version = "1.0"
+        };
+
+        var currentCarLocation = new Coordinate(vehicle.Location.Latitude, vehicle.Location.Longitude);
+
+        var zones = await haClient.GetZonesAscending(currentCarLocation);
+
+        Log.Debug("Zones: {0}", zones.Dump());
+
+        var tracker = new HaDeviceTracker(mqttClient, "CAR_LOCATION", haDevice)
+        {
+          Lat = currentCarLocation.Latitude.ToDouble(),
+          Lon = currentCarLocation.Longitude.ToDouble(),
+          StateValue = zones.FirstOrDefault()?.FriendlyName ?? appConfig.CarUnknownLocation
+        };
+
+        Log.Information("Car is at location: {0}", tracker.Dump());
+
+        Log.Debug("Announce sensor: {0}", tracker.Dump());
+        await tracker.Announce();
+        await tracker.PublishState();
+
+        var compactDetails = vehicle.Details.Compact("car");
+        var unitSystem = await haClient.GetUnitSystem();
+
+        Log.Information("Using unit system: {0}", unitSystem.Dump());
+
+        var shouldConvertKmToMiles = (appConfig.ConvertKmToMiles || unitSystem.Length != "km");
+
+        Log.Information("Convert km -> miles ? {0}", shouldConvertKmToMiles);
+
+        var sensors = compactDetails.Select(detail =>
+        {
+          var sensor = new HaSensor(mqttClient, detail.Key, haDevice)
           {
-            "warning": false,
-            "pressure": {
-              "value": "null",
-              "unit": "kPa"
-            },
-            "type": "FL",
-            "status": "NORMAL"
-          },
+            Value = detail.Value
+          };
+
+          if (detail.Key.EndsWith("_value"))
           {
-            "warning": false,
-            "pressure": {
-              "value": "null",
-              "unit": "kPa"
-            },
-            "type": "FR",
-            "status": "NORMAL"
-          },
-          {
-            "warning": false,
-            "pressure": {
-              "value": "null",
-              "unit": "kPa"
-            },
-            "type": "RL",
-            "status": "NORMAL"
-          },
-          {
-            "warning": false,
-            "pressure": {
-              "value": "null",
-              "unit": "kPa"
-            },
-            "type": "RR",
-            "status": "NORMAL"
-          }
-        ],
-        "batteryInfo": {
-          "batteryStatus": "0",
-          "batteryVoltage": {
-            "value": "14.55",
-            "unit": "volts"
-          }
-        },
-        "tripsInfo": {
-          "trips": [
+            var unitKey = detail.Key.Replace("_value", "_unit");
+
+            compactDetails.TryGetValue(unitKey, out var tmpUnit);
+
+            if (tmpUnit == "km")
             {
-              "totalElectricDistance": {
-                "value": "null",
-                "unit": "km"
-              },
-              "name": "TripA",
-              "totalDistance": {
-                "value": "1013",
-                "unit": "km"
-              },
-              "energyUsed": {
-                "value": "null",
-                "unit": "kmpl"
-              },
-              "averageEnergyUsed": {
-                "value": "null",
-                "unit": "kmpl"
-              },
-              "totalHybridDistance": {
-                "value": "null",
-                "unit": "km"
-              }
-            },
-            {
-              "totalElectricDistance": {
-                "value": "null",
-                "unit": "km"
-              },
-              "name": "TripB",
-              "totalDistance": {
-                "value": "14",
-                "unit": "km"
-              },
-              "energyUsed": {
-                "value": "null",
-                "unit": "kmpl"
-              },
-              "averageEnergyUsed": {
-                "value": "null",
-                "unit": "kmpl"
-              },
-              "totalHybridDistance": {
-                "value": "null",
-                "unit": "km"
+              sensor.DeviceClass = "distance";
+
+              if (shouldConvertKmToMiles && int.TryParse(detail.Value, out var kmValue))
+              {
+                var miValue = Math.Round(kmValue * 0.62137, 2);
+                sensor.Value = miValue.ToString(CultureInfo.InvariantCulture);
+                tmpUnit = "mi";
               }
             }
-          ]
-        },
-        "batPwrUsageDisp": null,
-        "distanceToService": {
-          "distanceToService": {
-            "value": "5127.0",
-            "unit": "km"
+
+            switch (tmpUnit)
+            {
+              case "volts":
+                sensor.DeviceClass = "voltage";
+                sensor.Unit = "V";
+                break;
+              case null or "null":
+                sensor.Unit = "";
+                break;
+              default:
+                sensor.Unit = tmpUnit;
+                break;
+            }
           }
-        },
-        "wheelCount": 4,
-        "hvacPwrUsageDisp": null,
-        "mtrPwrUsageDisp": null,
-        "tpmsvehicle": false,
-        "hVBatSOH": null,
-        "isTPMSVehicle": false,
-        "timestamp": 1665779022952
-      },
-      "evInfo": {
-        "chargeSchedules": [],
-        "battery": {
-          "stateOfCharge": 72,
-          "chargingLevel": "LEVEL_2",
-          "plugInStatus": true,
-          "timeToFullyChargeL2": 205,
-          "chargingStatus": "CHARGING",
-          "totalRange": 172,
-          "distanceToEmpty": {
-            "value": 172,
-            "unit": "km"
-          }
-        },
-        "timestamp": 1665822611085,
-        "schedules": [
-          {
-            "chargeToFull": false,
-            "scheduleType": "NONE",
-            "enableScheduleType": false,
-            "scheduledDays": {
-              "sunday": false,
-              "saturday": false,
-              "tuesday": false,
-              "wednesday": false,
-              "thursday": false,
-              "friday": false,
-              "monday": false
-            },
-            "startTime": "00:00",
-            "endTime": "00:00",
-            "cabinPriority": false,
-            "repeatSchedule": true
-          },
-          {
-            "chargeToFull": false,
-            "scheduleType": "NONE",
-            "enableScheduleType": false,
-            "scheduledDays": {
-              "sunday": false,
-              "saturday": false,
-              "tuesday": false,
-              "wednesday": false,
-              "thursday": false,
-              "friday": false,
-              "monday": false
-            },
-            "startTime": "00:00",
-            "endTime": "00:00",
-            "cabinPriority": false,
-            "repeatSchedule": true
-          },
-          {
-            "chargeToFull": false,
-            "scheduleType": "NONE",
-            "enableScheduleType": false,
-            "scheduledDays": {
-              "sunday": false,
-              "saturday": false,
-              "tuesday": false,
-              "wednesday": false,
-              "thursday": false,
-              "friday": false,
-              "monday": false
-            },
-            "startTime": "00:00",
-            "endTime": "00:00",
-            "cabinPriority": false,
-            "repeatSchedule": true
-          }
-        ]
-      },
-      "timestamp": 1665822611085
-    }
-    """);
-    
-    vehicle.Location = JsonConvert.DeserializeObject<VehicleLocation>("""
-    {
-      "TimeStamp": 1665779022952,
-      "Longitude": 4.1234365,
-      "Latitude": 69.4765989,
-      "Altitude": 40.346462111,
-      "Bearing": 0,
-      "IsLocationApprox": true
-    }
-    """);
 
-    return Task.FromResult(new[] { vehicle });
-  }
-}
+          return sensor;
+        }).ToDictionary(k => k.Name, v => v);
 
-public enum FcaBrand
-{
-  Fiat,
-  Ram,
-  Jeep,
-  Dodge,
-  AlfaRomeo
-}
-
-public enum FcaRegion
-{
-  Europe,
-  America
-}
-
-public class FiatClient : IFiatClient
-{
-  private readonly string _loginApiKey = "3_mOx_J2dRgjXYCdyhchv3b5lhi54eBcdCTX4BI8MORqmZCoQWhA0mV2PTlptLGUQI";
-  private readonly string _apiKey = "2wGyL6PHec9o1UeLPYpoYa1SkEWqeBur9bLsi24i";
-  private readonly string _loginUrl = "https://loginmyuconnect.fiat.com";
-  private readonly string _tokenUrl = "https://authz.sdpr-01.fcagcv.com/v2/cognito/identity/token";
-  private readonly string _apiUrl = "https://channels.sdpr-01.fcagcv.com";
-  private readonly string _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // for pin
-  private readonly string _authUrl = "https://mfa.fcl-01.fcagcv.com"; // for pin
-  private readonly string _locale = "de_de"; // for pin
-  private readonly RegionEndpoint _awsEndpoint = RegionEndpoint.EUWest1; 
-  
-  private readonly string _user;
-  private readonly string _password;
-  private readonly FcaBrand _brand;
-  private readonly FcaRegion _region;
-  private readonly CookieJar _cookieJar = new();
-
-  private readonly IFlurlClient _defaultHttpClient;
-
-  private (string userUid, ImmutableCredentials awsCredentials)? _loginInfo = null;
-
-  public FiatClient(string user, string password, FcaBrand brand = FcaBrand.Fiat, FcaRegion region = FcaRegion.Europe)
-  {
-    _user = user;
-    _password = password;
-    _brand = brand;
-    _region = region;
-
-    if (_brand == FcaBrand.Ram)
-    {
-      _loginApiKey = "3_7YjzjoSb7dYtCP5-D6FhPsCciggJFvM14hNPvXN9OsIiV1ujDqa4fNltDJYnHawO";
-      _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
-      _loginUrl = "https://login-us.ramtrucks.com";
-      _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
-      _apiUrl = "https://channels.sdpr-02.fcagcv.com";
-      _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // UNKNOWN
-      _authUrl = "https://mfa.fcl-01.fcagcv.com"; // UNKNOWN
-      _awsEndpoint = RegionEndpoint.USEast1;
-      _locale = "en_us";
-    }
-    else if(_brand == FcaBrand.Dodge)
-    {
-      _loginApiKey = "3_etlYkCXNEhz4_KJVYDqnK1CqxQjvJStJMawBohJU2ch3kp30b0QCJtLCzxJ93N-M";
-      _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
-      _loginUrl = "https://login-us.dodge.com";
-      _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
-      _apiUrl = "https://channels.sdpr-02.fcagcv.com";
-      _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // UNKNOWN
-      _authUrl = "https://mfa.fcl-01.fcagcv.com"; // UNKNOWN
-      _awsEndpoint = RegionEndpoint.USEast1;
-      _locale = "en_us";
-    }
-    else if (_brand == FcaBrand.Fiat && _region == FcaRegion.America)
-    {
-      _loginApiKey = "3_etlYkCXNEhz4_KJVYDqnK1CqxQjvJStJMawBohJU2ch3kp30b0QCJtLCzxJ93N-M";
-      _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
-      _loginUrl = "https://login-us.fiat.com";
-      _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
-      _apiUrl = "https://channels.sdpr-02.fcagcv.com";
-      _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // UNKNOWN
-      _authUrl = "https://mfa.fcl-01.fcagcv.com"; // UNKNOWN
-      _awsEndpoint = RegionEndpoint.USEast1;
-      _locale = "en_us";
-    }
-    else if (_brand == FcaBrand.Jeep)
-    {
-      if (_region == FcaRegion.Europe)
-      {
-        _loginApiKey = "3_ZvJpoiZQ4jT5ACwouBG5D1seGEntHGhlL0JYlZNtj95yERzqpH4fFyIewVMmmK7j";
-        _loginUrl = "https://login.jeep.com";
-      }
-      else
-      {
-        _loginApiKey = "3_5qxvrevRPG7--nEXe6huWdVvF5kV7bmmJcyLdaTJ8A45XUYpaR398QNeHkd7EB1X";
-        _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
-        _loginUrl = "https://login-us.jeep.com";
-        _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
-        _apiUrl = "https://channels.sdpr-02.fcagcv.com";
-        _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci"; 
-        _authUrl = "https://mfa.fcl-02.fcagcv.com"; 
-        _awsEndpoint = RegionEndpoint.USEast1;
-        _locale = "en_us";
-      }
-    }
-
-    _defaultHttpClient = new FlurlClient().Configure(settings =>
-    {
-      settings.HttpClientFactory = new PollyHttpClientFactory();
-    });
-  }
-
-  public async Task LoginAndKeepSessionAlive()
-  {
-    if (_loginInfo is not null)
-      return;
-    
-    await this.Login();
-    
-    _ = Task.Run(async () =>
-    {
-      var timer = new PeriodicTimer(TimeSpan.FromMinutes(2));
-      
-      while (await timer.WaitForNextTickAsync())
-      {
-        try
+        if (sensors.TryGetValue("car_evInfo_battery_stateOfCharge", out var stateOfChargeSensor))
         {
-          Log.Information("REFRESH SESSION");
-          await this.Login();
+          stateOfChargeSensor.DeviceClass = "battery";
+          stateOfChargeSensor.Unit = "%";
         }
-        catch (Exception e)
+
+        if (sensors.TryGetValue("car_evInfo_battery_timeToFullyChargeL2", out var timeToFullyChargeSensor))
         {
-          
-          Log.Error("ERROR WHILE REFRESH SESSION");
-          Log.Debug("{0}", e);
+          timeToFullyChargeSensor.DeviceClass = "duration";
+          timeToFullyChargeSensor.Unit = "min";
+        }
+
+        Log.Debug("Announce sensors: {0}", sensors.Dump());
+        Log.Information("Pushing new sensors and values to Home Assistant");
+
+        await Parallel.ForEachAsync(sensors.Values, async (sensor, token) => { await sensor.Announce(); });
+
+        Log.Debug("Waiting for home assistant to process all sensors");
+        await Task.Delay(TimeSpan.FromSeconds(5), ctx.CancellationToken);
+
+        await Parallel.ForEachAsync(sensors.Values, async (sensor, token) => { await sensor.PublishState(); });
+
+        var lastUpdate = new HaSensor(mqttClient, "LAST_UPDATE", haDevice)
+        {
+          Value = DateTime.Now.ToString("O"),
+          DeviceClass = "timestamp"
+        };
+
+        await lastUpdate.Announce();
+        await lastUpdate.PublishState();
+
+        var haEntities = persistentHaEntities.GetOrAdd(vehicle.Vin, s =>
+          CreateInteractiveEntities(fiatClient, mqttClient, vehicle, haDevice));
+
+        foreach (var haEntity in haEntities)
+        {
+          Log.Debug("Announce sensor: {0}", haEntity.Dump());
+          await haEntity.Announce();
         }
       }
-    });
-  }
+    }
+    catch (FlurlHttpException httpException)
+    {
+      Log.Warning($"Error connecting to the FIAT API. \n" +
+                  $"This can happen from time to time. Retrying in {appConfig.RefreshInterval} minutes.");
 
-  private async Task Login()
-  {
-    var loginResponse = await _loginUrl
-      .WithClient(_defaultHttpClient)
-      .AppendPathSegment("accounts.webSdkBootstrap")
-      .SetQueryParam("apiKey", _loginApiKey)
-      .WithCookies(_cookieJar)
-      .GetJsonAsync<FiatLoginResponse>();
+      Log.Debug("ERROR: {0}", httpException.Message);
+      Log.Debug("STATUS: {0}", httpException.StatusCode);
 
-    Log.Debug("{0}", loginResponse.Dump());
+      var task = httpException.Call?.Response?.GetStringAsync();
 
-    loginResponse.ThrowOnError("Login failed.");
-
-    var authResponse = await _loginUrl
-      .WithClient(_defaultHttpClient)
-      .AppendPathSegment("accounts.login")
-      .WithCookies(_cookieJar)
-      .PostUrlEncodedAsync(
-        WithFiatDefaultParameter(new()
-        {
-          { "loginID", _user },
-          { "password", _password },
-          { "sessionExpiration", TimeSpan.FromMinutes(5).TotalSeconds },
-          { "include", "profile,data,emails,subscriptions,preferences" },
-        }))
-      .ReceiveJson<FiatAuthResponse>();
-
-    Log.Debug("{0}", authResponse.Dump());
-
-    authResponse.ThrowOnError("Authentication failed.");
-
-    var jwtResponse = await _loginUrl
-      .WithClient(_defaultHttpClient)
-      .AppendPathSegment("accounts.getJWT")
-      .SetQueryParams(
-        WithFiatDefaultParameter(new()
-        {
-          { "fields", "profile.firstName,profile.lastName,profile.email,country,locale,data.disclaimerCodeGSDP" },
-          { "login_token", authResponse.SessionInfo.LoginToken }
-        }))
-      .WithCookies(_cookieJar)
-      .GetJsonAsync<FiatJwtResponse>();
-
-    Log.Debug("{0}", jwtResponse.Dump());
-
-    jwtResponse.ThrowOnError("Authentication failed.");
-
-    var identityResponse = await _tokenUrl
-      .WithClient(_defaultHttpClient)
-      .WithHeader("content-type", "application/json")
-      .WithHeaders(WithAwsDefaultParameter(_apiKey))
-      .PostJsonAsync(new
+      if (task != null)
       {
-        gigya_token = jwtResponse.IdToken,
-      })
-      .ReceiveJson<FcaIdentityResponse>();
-
-    Log.Debug("{0}", identityResponse.Dump());
-    
-    identityResponse.ThrowOnError("Identity failed.");
-
-    var client = new AmazonCognitoIdentityClient(new AnonymousAWSCredentials(), _awsEndpoint);
-
-    var res = await client.GetCredentialsForIdentityAsync(identityResponse.IdentityId,
-      new Dictionary<string, string>()
-      {
-        { "cognito-identity.amazonaws.com", identityResponse.Token }
-      });
-
-    _loginInfo = (authResponse.UID, new ImmutableCredentials(res.Credentials.AccessKeyId,
-      res.Credentials.SecretKey,
-      res.Credentials.SessionToken));
-  }
-
-  private Dictionary<string, object> WithAwsDefaultParameter(string apiKey, Dictionary<string, object>? parameters = null)
-  {
-    var dict = new Dictionary<string, object>()
+        Log.Debug("RESPONSE: {0}", await task);
+      }
+    }
+    catch (Exception e)
     {
-      { "x-clientapp-name", "CWP" },
-      { "x-clientapp-version", "1.0" },
-      { "clientrequestid", Guid.NewGuid().ToString("N")[..16] },
-      { "x-api-key", apiKey },
-      { "locale", _locale },
-      { "x-originator-type", "web" },
-    };
-
-    foreach (var parameter in parameters ?? new())
-      dict.Add(parameter.Key, parameter.Value);
-
-    return dict;
-  }
-
-  private Dictionary<string, object> WithFiatDefaultParameter(Dictionary<string, object>? parameters = null)
-  {
-    var dict = new Dictionary<string, object>()
-    {
-      { "targetEnv", "jssdk" },
-      { "loginMode", "standard" },
-      { "sdk", "js_latest" },
-      { "authMode", "cookie" },
-      { "sdkBuild", "12234" },
-      { "format", "json" },
-      { "APIKey", _loginApiKey },
-    };
-
-    foreach (var parameter in parameters ?? new())
-      dict.Add(parameter.Key, parameter.Value);
-
-    return dict;
-  }
-  
-  public async Task SendCommand(string vin, string command, string pin, string action)
-  {
-    ArgumentNullException.ThrowIfNull(_loginInfo);
-    
-    var (userUid, awsCredentials) = _loginInfo.Value;
-
-    var data = new
-    {
-      pin = Convert.ToBase64String(Encoding.UTF8.GetBytes(pin))
-    };
-
-    var pinAuthResponse = await _authUrl
-      .AppendPathSegments("v1", "accounts", userUid, "ignite", "pin", "authenticate")
-      .WithHeaders(WithAwsDefaultParameter(_authApiKey))
-      .AwsSign(awsCredentials, _awsEndpoint, data)
-      .PostJsonAsync(data)
-      .ReceiveJson<FcaPinAuthResponse>();
-
-    Log.Debug("{0}", pinAuthResponse.Dump());
-
-    var json = new
-    {
-      command, 
-      pinAuth = pinAuthResponse.Token
-    };
-
-    var commandResponse = await _apiUrl
-      .AppendPathSegments("v1", "accounts", userUid, "vehicles", vin, action)
-      .WithHeaders(WithAwsDefaultParameter(_apiKey))
-      .AwsSign(awsCredentials, _awsEndpoint, json)
-      .PostJsonAsync(json)
-      .ReceiveJson<FcaCommandResponse>();
-
-    Log.Debug("{0}", commandResponse.Dump());
-  }
-
-  public async Task<Vehicle[]> Fetch()
-  {
-    ArgumentNullException.ThrowIfNull(_loginInfo);
-
-    var (userUid, awsCredentials) = _loginInfo.Value;
-
-    var vehicleResponse = await _apiUrl
-      .WithClient(_defaultHttpClient)
-      .AppendPathSegments("v4", "accounts", userUid, "vehicles")
-      .SetQueryParam("stage", "ALL")
-      .WithHeaders(WithAwsDefaultParameter(_apiKey))
-      .AwsSign(awsCredentials, _awsEndpoint)
-      .GetJsonAsync<VehicleResponse>();
-
-    Log.Debug("{0}", vehicleResponse.Dump());
-
-    foreach (var vehicle in vehicleResponse.Vehicles)
-    {
-      var vehicleDetails = await _apiUrl
-        .WithClient(_defaultHttpClient)
-        .AppendPathSegments("v2", "accounts", userUid, "vehicles", vehicle.Vin, "status")
-        .WithHeaders(WithAwsDefaultParameter(_apiKey))
-        .AwsSign(awsCredentials, _awsEndpoint)
-        .GetJsonAsync<JObject>();
-      
-      Log.Debug("{0}", vehicleDetails.Dump());
-
-      vehicle.Details = vehicleDetails;
-
-      var vehicleLocation = await _apiUrl
-        .WithClient(_defaultHttpClient)
-        .AppendPathSegments("v1", "accounts", userUid, "vehicles", vehicle.Vin, "location", "lastknown")
-        .WithHeaders(WithAwsDefaultParameter(_apiKey))
-        .AwsSign(awsCredentials, _awsEndpoint)
-        .GetJsonAsync<VehicleLocation>();
-
-      vehicle.Location = vehicleLocation;
-
-      Log.Debug("{0}", vehicleLocation.Dump());
+      Log.Error("{0}", e);
     }
 
-    return vehicleResponse.Vehicles;
+    Log.Information("Fetching COMPLETED. Next update in {0} minutes.", appConfig.RefreshInterval);
+
+    WaitHandle.WaitAny(new[]
+    {
+      ctx.CancellationToken.WaitHandle,
+      forceLoopResetEvent
+    }, TimeSpan.FromMinutes(appConfig.RefreshInterval));
   }
+});
+
+async Task<bool> TrySendCommand(IFiatClient fiatClient, FiatCommand command, string vin)
+{
+  Log.Information("SEND COMMAND {0}: ", command.Message);
+
+  if (string.IsNullOrWhiteSpace(appconfig.FCAPin))
+  {
+    throw new Exception("PIN NOT SET");
+  }
+
+  var pin = appconfig.FCAPin;
+
+  if (command.IsDangerous && !appConfig.EnableDangerousCommands)
+  {
+    Log.Warning("{0} not sent. " +
+                "Set \"EnableDangerousCommands\" option if you want to use it. ", command.Message);
+    return false;
+  }
+
+  try
+  {
+    await fiatClient.SendCommand(vin, command.Message, pin, command.Action);
+    await Task.Delay(TimeSpan.FromSeconds(5));
+    Log.Information("Command: {0} SUCCESSFUL", command.Message);
+  }
+  catch (Exception e)
+  {
+    Log.Error("Command: {0} ERROR. Maybe wrong pin?", command.Message);
+    Log.Debug("{0}", e);
+    return false;
+  }
+
+  return true;
+}
+
+IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMqttClient mqttClient, Vehicle vehicle,
+  HaDevice haDevice)
+{
+  var updateLocationButton = new HaButton(mqttClient, "UpdateLocation", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.VF, vehicle.Vin))
+      {
+          await Task.Delay(TimeSpan.FromSeconds(6), ctx.CancellationToken);
+          forceLoopResetEvent.Set();
+      }
+  });
+
+  var deepRefreshButton = new HaButton(mqttClient, "DeepRefresh", haDevice, async button =>
+  {
+      if (vinPlugged.Contains(vehicle.Vin))
+      {
+          if (await TrySendCommand(fiatClient, FiatCommand.DEEPREFRESH, vehicle.Vin))
+          {
+              await Task.Delay(TimeSpan.FromSeconds(6), ctx.CancellationToken);
+              forceLoopResetEvent.Set();
+          }
+      }
+  });
+
+  var lightsButton = new HaButton(mqttClient, "Light", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.HBLF, vehicle.Vin))
+      {
+          forceLoopResetEvent.Set();
+      }
+  });
+
+
+  var hvacButton = new HaButton(mqttClient, "HVAC", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.ROPRECOND, vehicle.Vin))
+      {
+          forceLoopResetEvent.Set();
+      }
+  });
+
+  var startengineButton = new HaButton(mqttClient, "StartEngine", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.REON, vehicle.Vin))
+      {
+          forceLoopResetEvent.Set();
+      }
+  });
+
+  var stopengineButton = new HaButton(mqttClient, "StopEngine", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.REOFF, vehicle.Vin))
+      {
+          forceLoopResetEvent.Set();
+      }
+  });
+
+
+  var lockButton = new HaButton(mqttClient, "DoorLock", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.RDL, vehicle.Vin))
+      {
+          forceLoopResetEvent.Set();
+      }
+  });
+
+  var unLockButton = new HaButton(mqttClient, "DoorUnlock", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.RDU, vehicle.Vin))
+      {
+          forceLoopResetEvent.Set();
+      }
+  });
+
+  var fetchNowButton = new HaButton(mqttClient, "FetchNow", haDevice, async button =>
+  {
+      Log.Information($"Force Fetch Now");
+      await Task.Run(() => forceLoopResetEvent.Set());
+  });
+
+  var suppressalarmButton = new HaButton(mqttClient, "SuppressAlarm", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.TA, vehicle.Vin))
+      {
+          forceLoopResetEvent.Set();
+      }
+  });
+
+  var locktrunkButton = new HaButton(mqttClient, "LockTrunk", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.ROTRUNKLOCK, vehicle.Vin))
+      {
+          forceLoopResetEvent.Set();
+      }
+  });
+
+  var unlocktrunkButton = new HaButton(mqttClient, "UnlockTrunk", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.ROTRUNKUNLOCK, vehicle.Vin))
+      {
+          forceLoopResetEvent.Set();
+      }
+  });
+
+  return new HaEntity[]
+  {
+    UpdateLocation,
+    DeepRefresh,
+    Light,
+    HVAC,
+    StartEngine,
+    StopEngine,
+    DoorLock,
+    DoorUnlock,
+    FetchNow,
+    SuppressAlarm,
+    LockTrunk,
+    UnlockTrunk
+  };
 }
