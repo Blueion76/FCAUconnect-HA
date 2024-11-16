@@ -8,7 +8,7 @@ public abstract class BaseResponse
   public abstract void ThrowOnError(string message);
 }
 
-public class FCAResponse
+public class FiatResponse
 {
   public string CallId { get; set; }
   public long ErrorCode { get; set; }
@@ -33,17 +33,17 @@ public class FCAResponse
   }
 }
 
-public class FCALoginResponse : FCAResponse
+public class FiatLoginResponse : FiatResponse
 {
 }
 
-public class FCAAuthResponse : FCAResponse
+public class FiatAuthResponse : FiatResponse
 {
   public string UID { get; set; }
   public FiatSessionInfo SessionInfo { get; set; }
 }
 
-public class FCAJwtResponse : FCAResponse
+public class FiatJwtResponse : FiatResponse
 {
   [JsonProperty("id_token")] public string IdToken { get; set; }
 }
@@ -67,7 +67,7 @@ public class FcaIdentityResponse : BaseResponse
   }
 }
 
-public class FCASessionInfo
+public class FiatSessionInfo
 {
   [JsonProperty("login_token")] public string LoginToken { get; set; }
 }
