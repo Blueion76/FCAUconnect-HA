@@ -197,7 +197,10 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
           Value = DateTime.Now.ToString("O"),
           DeviceClass = "timestamp"
         };
-
+                
+        await lastUpdate.Announce();
+        await lastUpdate.PublishState();
+        
         var localTime = GetLocalTime(vehicle.Location.TimeStamp);
         Log.Debug($"Location TimeStamp: {localTime}");
         
@@ -206,10 +209,11 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
             Value = localTime.ToString("O"),  // ISO 8601 string format
             DeviceClass = "timestamp"
         };
-                
-        await lastUpdate.Announce();
-        await lastUpdate.PublishState();
 
+        await trackerTimeStamp.Announce();
+        await trackerTimeStamp.PublishState();
+
+        
         var haEntities = persistentHaEntities.GetOrAdd(vehicle.Vin, s =>
           CreateInteractiveEntities(fiatClient, mqttClient, vehicle, haDevice));
 
