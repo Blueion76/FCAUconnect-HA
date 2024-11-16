@@ -14,32 +14,31 @@ options:
   FCAUser: ""
   FCAPw: ""
   FCAPin: ""
-
   Brand: "Jeep"
-  Region: "US"
-  
   RefreshInterval: 2
+  ConvertKmtoMiles: false
   Debug: false
-  AutoDeepRefresh: false
-  AutoDeepInterval: 15
-
+  AutoRefreshLocation: false
+  AutoRefreshBattery: false
+  EnableDangerousCommands: true
+  carUnknownLocation: "away"
   StartDelaySeconds: 2
 schema:
   FCAUser: str
   FCAPw: password
   FCAPin: password?
-
-  Brand: list(Fiat|AlfaRomeo|Jeep|Debug)
-  Region: list(Europe|US)
-  
+  Brand: list(Fiat|Ram|Jeep|Dodge|AlfaRomeo)
+  Region: list(Europe|America)
   RefreshInterval: int
   Debug: bool
-  AutoDeepRefresh: bool
-  AutoDeepInterval: int
+  AutoRefreshBattery: bool
+  AutoRefreshLocation: bool
+  EnableDangerousCommands: bool
   OverrideMqttUser: str?
   OverrideMqttPw: password?
   OverrideMqttServer: str?
   OverrideMqttPort: int?
+  CarUnknownLocation: str
   StartDelaySeconds: int?
 arch:
   - amd64
