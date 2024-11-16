@@ -8,41 +8,312 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 
-namespace FCAUconnect;
+namespace FCAUconnect;;
+
+public interface IFiatClient
+{
+  Task LoginAndKeepSessionAlive();
+  Task SendCommand(string vin, string command, string pin, string action);
+  Task<Vehicle[]> Fetch();
+}
+
+public class FiatClientFake : IFiatClient
+{
+  public Task LoginAndKeepSessionAlive()
+  {
+    return Task.CompletedTask;
+  }
+
+  public Task SendCommand(string vin, string command, string pin, string action)
+  {
+    return Task.CompletedTask;
+  }
+
+  public Task<Vehicle[]> Fetch()
+  {
+    var vehicle = JsonConvert.DeserializeObject<Vehicle>("""
+    {
+      "RegStatus": "COMPLETED_STAGE_3",
+      "Color": "BLUE",
+      "Year": 2022,
+      "TsoBodyCode": "",
+      "NavEnabledHu": false,
+      "Language": "",
+      "CustomerRegStatus": "Y",
+      "Radio": "",
+      "ActivationSource": "DEALER",
+      "Nickname": "KEKW",
+      "Vin": "LDM1SN7DHD7DHSHJ6753D",
+      "Company": "FCA",
+      "Model": 332,
+      "ModelDescription": "Neuer 500 3+1",
+      "TcuType": 2,
+      "Make": "FIAT",
+      "BrandCode": "12",
+      "SoldRegion": "EMEA"
+    }
+    """);
+    
+    vehicle.Details = JObject.Parse("""
+    {
+      "vehicleInfo": {
+        "totalRangeADA": null,
+        "odometer": {
+          "odometer": {
+            "value": "1234",
+            "unit": "km"
+          }
+        },
+        "daysToService": "null",
+        "fuel": {
+          "fuelAmountLevel": null,
+          "isFuelLevelLow": false,
+          "distanceToEmpty": {
+            "value": "150",
+            "unit": "km"
+          },
+          "fuelAmount": {
+            "value": "null",
+            "unit": "null"
+          }
+        },
+        "oilLevel": {
+          "oilLevel": null
+        },
+        "tyrePressure": [
+          {
+            "warning": false,
+            "pressure": {
+              "value": "null",
+              "unit": "kPa"
+            },
+            "type": "FL",
+            "status": "NORMAL"
+          },
+          {
+            "warning": false,
+            "pressure": {
+              "value": "null",
+              "unit": "kPa"
+            },
+            "type": "FR",
+            "status": "NORMAL"
+          },
+          {
+            "warning": false,
+            "pressure": {
+              "value": "null",
+              "unit": "kPa"
+            },
+            "type": "RL",
+            "status": "NORMAL"
+          },
+          {
+            "warning": false,
+            "pressure": {
+              "value": "null",
+              "unit": "kPa"
+            },
+            "type": "RR",
+            "status": "NORMAL"
+          }
+        ],
+        "batteryInfo": {
+          "batteryStatus": "0",
+          "batteryVoltage": {
+            "value": "14.55",
+            "unit": "volts"
+          }
+        },
+        "tripsInfo": {
+          "trips": [
+            {
+              "totalElectricDistance": {
+                "value": "null",
+                "unit": "km"
+              },
+              "name": "TripA",
+              "totalDistance": {
+                "value": "1013",
+                "unit": "km"
+              },
+              "energyUsed": {
+                "value": "null",
+                "unit": "kmpl"
+              },
+              "averageEnergyUsed": {
+                "value": "null",
+                "unit": "kmpl"
+              },
+              "totalHybridDistance": {
+                "value": "null",
+                "unit": "km"
+              }
+            },
+            {
+              "totalElectricDistance": {
+                "value": "null",
+                "unit": "km"
+              },
+              "name": "TripB",
+              "totalDistance": {
+                "value": "14",
+                "unit": "km"
+              },
+              "energyUsed": {
+                "value": "null",
+                "unit": "kmpl"
+              },
+              "averageEnergyUsed": {
+                "value": "null",
+                "unit": "kmpl"
+              },
+              "totalHybridDistance": {
+                "value": "null",
+                "unit": "km"
+              }
+            }
+          ]
+        },
+        "batPwrUsageDisp": null,
+        "distanceToService": {
+          "distanceToService": {
+            "value": "5127.0",
+            "unit": "km"
+          }
+        },
+        "wheelCount": 4,
+        "hvacPwrUsageDisp": null,
+        "mtrPwrUsageDisp": null,
+        "tpmsvehicle": false,
+        "hVBatSOH": null,
+        "isTPMSVehicle": false,
+        "timestamp": 1665779022952
+      },
+      "evInfo": {
+        "chargeSchedules": [],
+        "battery": {
+          "stateOfCharge": 72,
+          "chargingLevel": "LEVEL_2",
+          "plugInStatus": true,
+          "timeToFullyChargeL2": 205,
+          "chargingStatus": "CHARGING",
+          "totalRange": 172,
+          "distanceToEmpty": {
+            "value": 172,
+            "unit": "km"
+          }
+        },
+        "timestamp": 1665822611085,
+        "schedules": [
+          {
+            "chargeToFull": false,
+            "scheduleType": "NONE",
+            "enableScheduleType": false,
+            "scheduledDays": {
+              "sunday": false,
+              "saturday": false,
+              "tuesday": false,
+              "wednesday": false,
+              "thursday": false,
+              "friday": false,
+              "monday": false
+            },
+            "startTime": "00:00",
+            "endTime": "00:00",
+            "cabinPriority": false,
+            "repeatSchedule": true
+          },
+          {
+            "chargeToFull": false,
+            "scheduleType": "NONE",
+            "enableScheduleType": false,
+            "scheduledDays": {
+              "sunday": false,
+              "saturday": false,
+              "tuesday": false,
+              "wednesday": false,
+              "thursday": false,
+              "friday": false,
+              "monday": false
+            },
+            "startTime": "00:00",
+            "endTime": "00:00",
+            "cabinPriority": false,
+            "repeatSchedule": true
+          },
+          {
+            "chargeToFull": false,
+            "scheduleType": "NONE",
+            "enableScheduleType": false,
+            "scheduledDays": {
+              "sunday": false,
+              "saturday": false,
+              "tuesday": false,
+              "wednesday": false,
+              "thursday": false,
+              "friday": false,
+              "monday": false
+            },
+            "startTime": "00:00",
+            "endTime": "00:00",
+            "cabinPriority": false,
+            "repeatSchedule": true
+          }
+        ]
+      },
+      "timestamp": 1665822611085
+    }
+    """);
+    
+    vehicle.Location = JsonConvert.DeserializeObject<VehicleLocation>("""
+    {
+      "TimeStamp": 1665779022952,
+      "Longitude": 4.1234365,
+      "Latitude": 69.4765989,
+      "Altitude": 40.346462111,
+      "Bearing": 0,
+      "IsLocationApprox": true
+    }
+    """);
+
+    return Task.FromResult(new[] { vehicle });
+  }
+}
 
 public enum FcaBrand
 {
   Fiat,
+  Ram,
   Jeep,
-  AlfaRomeo,
-  Debug
+  Dodge,
+  AlfaRomeo
 }
 
 public enum FcaRegion
 {
   Europe,
-  US
+  America
 }
 
-public class FiatClient 
+public class FiatClient : IFiatClient
 {
-  private readonly string _loginApiKey = "";
-  private readonly string _apiKey= "";
-  private readonly string _loginUrl= "";
-  private readonly string _tokenUrl= "";
-  private readonly string _apiUrl= "";
-  private readonly string _authApiKey= ""; // for pin
-  private readonly string _authUrl= ""; // for pin
-  private readonly string _locale = ""; // for pin
+  private readonly string _loginApiKey = "3_mOx_J2dRgjXYCdyhchv3b5lhi54eBcdCTX4BI8MORqmZCoQWhA0mV2PTlptLGUQI";
+  private readonly string _apiKey = "2wGyL6PHec9o1UeLPYpoYa1SkEWqeBur9bLsi24i";
+  private readonly string _loginUrl = "https://loginmyuconnect.fiat.com";
+  private readonly string _tokenUrl = "https://authz.sdpr-01.fcagcv.com/v2/cognito/identity/token";
+  private readonly string _apiUrl = "https://channels.sdpr-01.fcagcv.com";
+  private readonly string _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // for pin
+  private readonly string _authUrl = "https://mfa.fcl-01.fcagcv.com"; // for pin
+  private readonly string _locale = "de_de"; // for pin
   private readonly RegionEndpoint _awsEndpoint = RegionEndpoint.EUWest1; 
   
   private readonly string _user;
   private readonly string _password;
-  private readonly CookieJar _cookieJar = new();
-
   private readonly FcaBrand _brand;
   private readonly FcaRegion _region;
-  
+  private readonly CookieJar _cookieJar = new();
+
   private readonly IFlurlClient _defaultHttpClient;
 
   private (string userUid, ImmutableCredentials awsCredentials)? _loginInfo = null;
@@ -54,82 +325,63 @@ public class FiatClient
     _brand = brand;
     _region = region;
 
-    if (_region == FcaRegion.Europe)
+    if (_brand == FcaBrand.Ram)
     {
-      _loginApiKey = "3_mOx_J2dRgjXYCdyhchv3b5lhi54eBcdCTX4BI8MORqmZCoQWhA0mV2PTlptLGUQI";
-
-      _apiKey = "qLYupk65UU1tw2Ih1cJhs4izijgRDbir2UFHA3Je";
-      _tokenUrl = "https://authz.sdpr-01.fcagcv.com/v2/cognito/identity/token";
-      _apiUrl = "https://channels.sdpr-01.fcagcv.com";
-
-      _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // for pin
-      _authUrl = "https://mfa.fcl-01.fcagcv.com"; // for pin
-
-      _locale = "de_de"; // for pin
-      _awsEndpoint = RegionEndpoint.EUWest1; 
-    }
-    else
-    {
-      _loginApiKey = "3_5qxvrevRPG7--nEXe6huWdVvF5kV7bmmJcyLdaTJ8A45XUYpaR398QNeHkd7EB1X";
-
-       _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
+      _loginApiKey = "3_7YjzjoSb7dYtCP5-D6FhPsCciggJFvM14hNPvXN9OsIiV1ujDqa4fNltDJYnHawO";
+      _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
+      _loginUrl = "https://login-us.ramtrucks.com";
       _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
       _apiUrl = "https://channels.sdpr-02.fcagcv.com";
-
-      _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci"; // UNKNOWN
-      _authUrl = "https://mfa.fcl-02.fcagcv.com"; // UNKNOWN
-
-      _locale = "en_us";
+      _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // UNKNOWN
+      _authUrl = "https://mfa.fcl-01.fcagcv.com"; // UNKNOWN
       _awsEndpoint = RegionEndpoint.USEast1;
+      _locale = "en_us";
     }
-
-    if (_brand == FcaBrand.Debug)
+    else if(_brand == FcaBrand.Dodge)
     {
       _loginApiKey = "3_etlYkCXNEhz4_KJVYDqnK1CqxQjvJStJMawBohJU2ch3kp30b0QCJtLCzxJ93N-M";
-       _loginUrl = "https://login-us.alfaromeo.com";
-      _apiKey = "2wGyL6PHec9o1UeLPYpoYa1SkEWqeBur9bLsi24i";
-      _tokenUrl = "https://authz.sdpr-01.fcagcv.com/v2/cognito/identity/token";
-      _apiUrl = "https://channels.sdpr-01.fcagcv.com";
-      _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // for pin
-      _authUrl = "https://mfa.fcl-01.fcagcv.com"; // for pin
-       _locale = "en_us";
+      _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
+      _loginUrl = "https://login-us.dodge.com";
+      _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
+      _apiUrl = "https://channels.sdpr-02.fcagcv.com";
+      _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // UNKNOWN
+      _authUrl = "https://mfa.fcl-01.fcagcv.com"; // UNKNOWN
       _awsEndpoint = RegionEndpoint.USEast1;
+      _locale = "en_us";
     }
-    else if (_brand == FcaBrand.Fiat)
+    else if (_brand == FcaBrand.Fiat && _region == FcaRegion.America)
     {
-      if (_region == FcaRegion.Europe)
-      {
-        _loginUrl = "https://loginmyuconnect.fiat.com";
-      }
-      else
-      {
-        _loginUrl = "https://login-us.fiat.com";
-      }
-    }
-    else if (_brand == FcaBrand.AlfaRomeo)
-    {
-      if (_region == FcaRegion.Europe)
-      {
-        _loginUrl = "https://login.alfaromeo.com";
-      }
-      else
-      {
-       _loginUrl = "https://login-us.alfaromeo.com";      
-      }
+      _loginApiKey = "3_etlYkCXNEhz4_KJVYDqnK1CqxQjvJStJMawBohJU2ch3kp30b0QCJtLCzxJ93N-M";
+      _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
+      _loginUrl = "https://login-us.fiat.com";
+      _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
+      _apiUrl = "https://channels.sdpr-02.fcagcv.com";
+      _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // UNKNOWN
+      _authUrl = "https://mfa.fcl-01.fcagcv.com"; // UNKNOWN
+      _awsEndpoint = RegionEndpoint.USEast1;
+      _locale = "en_us";
     }
     else if (_brand == FcaBrand.Jeep)
     {
       if (_region == FcaRegion.Europe)
       {
+        _loginApiKey = "3_ZvJpoiZQ4jT5ACwouBG5D1seGEntHGhlL0JYlZNtj95yERzqpH4fFyIewVMmmK7j";
         _loginUrl = "https://login.jeep.com";
       }
       else
       {
+        _loginApiKey = "3_5qxvrevRPG7--nEXe6huWdVvF5kV7bmmJcyLdaTJ8A45XUYpaR398QNeHkd7EB1X";
+        _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
         _loginUrl = "https://login-us.jeep.com";
+        _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
+        _apiUrl = "https://channels.sdpr-02.fcagcv.com";
+        _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci"; 
+        _authUrl = "https://mfa.fcl-02.fcagcv.com"; 
+        _awsEndpoint = RegionEndpoint.USEast1;
+        _locale = "en_us";
       }
     }
 
-    
     _defaultHttpClient = new FlurlClient().Configure(settings =>
     {
       settings.HttpClientFactory = new PollyHttpClientFactory();
@@ -151,14 +403,14 @@ public class FiatClient
       {
         try
         {
-          Log.Information("Refresh Session");
+          Log.Information("REFRESH SESSION");
           await this.Login();
         }
         catch (Exception e)
         {
           
           Log.Error("ERROR WHILE REFRESH SESSION");
-          Log.Debug("login {0}", e);
+          Log.Debug("{0}", e);
         }
       }
     });
@@ -173,7 +425,7 @@ public class FiatClient
       .WithCookies(_cookieJar)
       .GetJsonAsync<FiatLoginResponse>();
 
-    Log.Debug("loginResponse: {0}", loginResponse.Dump());
+    Log.Debug("{0}", loginResponse.Dump());
 
     loginResponse.ThrowOnError("Login failed.");
 
@@ -191,7 +443,7 @@ public class FiatClient
         }))
       .ReceiveJson<FiatAuthResponse>();
 
-    Log.Debug("authResponse : {0}", authResponse.Dump());
+    Log.Debug("{0}", authResponse.Dump());
 
     authResponse.ThrowOnError("Authentication failed.");
 
@@ -207,7 +459,7 @@ public class FiatClient
       .WithCookies(_cookieJar)
       .GetJsonAsync<FiatJwtResponse>();
 
-    Log.Debug("jwtResponse : {0}", jwtResponse.Dump());
+    Log.Debug("{0}", jwtResponse.Dump());
 
     jwtResponse.ThrowOnError("Authentication failed.");
 
@@ -221,7 +473,7 @@ public class FiatClient
       })
       .ReceiveJson<FcaIdentityResponse>();
 
-    Log.Debug("identityResponse : {0}", identityResponse.Dump());
+    Log.Debug("{0}", identityResponse.Dump());
     
     identityResponse.ThrowOnError("Identity failed.");
 
@@ -293,7 +545,7 @@ public class FiatClient
       .PostJsonAsync(data)
       .ReceiveJson<FcaPinAuthResponse>();
 
-    Log.Debug("pinAuthResponse: {0}", pinAuthResponse.Dump());
+    Log.Debug("{0}", pinAuthResponse.Dump());
 
     var json = new
     {
@@ -308,7 +560,7 @@ public class FiatClient
       .PostJsonAsync(json)
       .ReceiveJson<FcaCommandResponse>();
 
-    Log.Debug("commandResponse: {0}", commandResponse.Dump());
+    Log.Debug("{0}", commandResponse.Dump());
   }
 
   public async Task<Vehicle[]> Fetch()
@@ -325,7 +577,7 @@ public class FiatClient
       .AwsSign(awsCredentials, _awsEndpoint)
       .GetJsonAsync<VehicleResponse>();
 
-    Log.Debug("vehicleResponse: {0}", vehicleResponse.Dump());
+    Log.Debug("{0}", vehicleResponse.Dump());
 
     foreach (var vehicle in vehicleResponse.Vehicles)
     {
@@ -336,7 +588,7 @@ public class FiatClient
         .AwsSign(awsCredentials, _awsEndpoint)
         .GetJsonAsync<JObject>();
       
-      Log.Debug("vehicleDetails: {0}", vehicleDetails.Dump());
+      Log.Debug("{0}", vehicleDetails.Dump());
 
       vehicle.Details = vehicleDetails;
 
@@ -349,10 +601,9 @@ public class FiatClient
 
       vehicle.Location = vehicleLocation;
 
-      Log.Debug("vehicleLocation: {0}", vehicleLocation.Dump());
+      Log.Debug("{0}", vehicleLocation.Dump());
     }
 
     return vehicleResponse.Vehicles;
   }
 }
-
