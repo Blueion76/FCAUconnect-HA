@@ -192,14 +192,14 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
 
         await Parallel.ForEachAsync(sensors.Values, async (sensor, token) => { await sensor.PublishState(); });
 
-        var lastUpdate = new HaSensor(mqttClient, "LAST_UPDATE", haDevice)
+        var lastUpdate = new HaSensor(mqttClient, "Last_API_Update", haDevice)
         {
-          Value = DateTime.Now.ToString("MM/dd HH:mm:ss"),
+          Value = DateTime.Now.ToString("O"),
           DeviceClass = "timestamp"
         };
-        var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice)
+        var trackerTimeStamp = new HaSensor(mqttClient, "Last_GPS_Update", haDevice)
         {
-          Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("MM/dd HH:mm:ss"),
+          Value = vehicle.Location.TimeStamp.ToString("O"),
           DeviceClass = "timestamp"
         };
         
@@ -271,11 +271,6 @@ async Task<bool> TrySendCommand(IFiatClient fiatClient, FiatCommand command, str
   }
 
   return true;
-}
-
-DateTime GetLocalTime(long timeStamp)
-{
-    return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
 }
 
 IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMqttClient mqttClient, Vehicle vehicle,
