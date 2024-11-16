@@ -112,12 +112,6 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
           StateValue = zones.FirstOrDefault()?.FriendlyName ?? AppConfig.CarUnknownLocation
         };
         
-        var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice)
-        {
-            Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("O"),
-            DeviceClass = "duration"
-        };
-        
         Log.Information("Car is at location: {0}", tracker.Dump());
 
         Log.Debug("Announce sensor: {0}", tracker.Dump());
@@ -201,9 +195,15 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
         var lastUpdate = new HaSensor(mqttClient, "LAST_API_UPDATE", haDevice)
         {
           Value = DateTime.Now.ToString("O"),
-          DeviceClass = "duration"
+          DeviceClass = "timestamp"
         };
         
+        var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice)
+        {
+          Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("O"),
+          DeviceClass = "timestamp"
+        };
+                
         await lastUpdate.Announce();
         await lastUpdate.PublishState();
 
