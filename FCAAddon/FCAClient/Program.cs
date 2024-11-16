@@ -194,10 +194,17 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
 
         var lastUpdate = new HaSensor(mqttClient, "LAST_UPDATE", haDevice)
         {
-          Value = DateTime.Now.ToString("O"),
+          Value = DateTime.Now.ToString("MM/dd HH:mm:ss"),
           DeviceClass = "timestamp"
         };
-
+        var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice, false)
+        {
+          Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("MM/dd HH:mm:ss"),
+          DeviceClass = "timestamp"
+        };
+    
+        haEntities.Add(trackerTimeStamp);
+        
         await lastUpdate.Announce();
         await lastUpdate.PublishState();
 
@@ -213,7 +220,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
     }
     catch (FlurlHttpException httpException)
     {
-      Log.Warning($"Error connecting to the FIAT API. \n" +
+      Log.Warning($"Error connecting to the FCA API. \n" +
                   $"This can happen from time to time. Retrying in {AppConfig.RefreshInterval} minutes.");
 
       Log.Debug("ERROR: {0}", httpException.Message);
@@ -382,4 +389,8 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     locktrunkButton,
     unlocktrunkButton
   };
+
+DateTime GetLocalTime(long timeStamp)
+{
+    return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
 }
