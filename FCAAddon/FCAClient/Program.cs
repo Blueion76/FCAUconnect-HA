@@ -114,7 +114,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
         
         var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice)
         {
-            Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("MM/dd HH:mm:ss"),
+            Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("O"),
             DeviceClass = "duration"
         };
         
@@ -200,7 +200,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
 
         var lastUpdate = new HaSensor(mqttClient, "LAST_API_UPDATE", haDevice)
         {
-          Value = DateTime.Now.ToString("MM/dd HH:mm:ss"),
+          Value = DateTime.Now.ToString("O"),
           DeviceClass = "duration"
         };
         
