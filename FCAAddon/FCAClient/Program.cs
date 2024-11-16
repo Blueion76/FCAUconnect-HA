@@ -280,23 +280,14 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
 {
   var updateLocationButton = new HaButton(mqttClient, "UpdateLocation", haDevice, async button =>
   {
-      if (await TrySendCommand(fiatClient, FiatCommand.VF, vehicle.Vin))
-      {
-          await Task.Delay(TimeSpan.FromSeconds(6), ctx.CancellationToken);
-          forceLoopResetEvent.Set();
-      }
+    if (await TrySendCommand(fiatClient, FiatCommand.VF, vehicle.Vin))
+      forceLoopResetEvent.Set();
   });
 
   var deepRefreshButton = new HaButton(mqttClient, "DeepRefresh", haDevice, async button =>
   {
-      if (vinPlugged.Contains(vehicle.Vin))
-      {
-          if (await TrySendCommand(fiatClient, FiatCommand.DEEPREFRESH, vehicle.Vin))
-          {
-              await Task.Delay(TimeSpan.FromSeconds(6), ctx.CancellationToken);
-              forceLoopResetEvent.Set();
-          }
-      }
+    if (await TrySendCommand(fiatClient, FiatCommand.DEEPREFRESH, vehicle.Vin))
+      forceLoopResetEvent.Set();
   });
 
   var lightsButton = new HaButton(mqttClient, "Light", haDevice, async button =>
