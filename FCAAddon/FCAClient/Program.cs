@@ -390,8 +390,11 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     unlocktrunkButton
   };
 
+}
 
 DateTime GetLocalTime(long timeStamp)
 {
     return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
+}
+
 }
