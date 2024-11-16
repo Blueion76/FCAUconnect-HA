@@ -47,7 +47,7 @@ public class FCAClient
 
   private (string userUid, ImmutableCredentials awsCredentials)? _loginInfo = null;
 
-  public FCAClient(string user, string password, FcaBrand brand = FcaBrand.Fiat, FcaRegion region = FcaRegion.Europe)
+  public FCAClient(string user, string password, FcaBrand brand = FcaBrand.fiat, FcaRegion region = FcaRegion.Europe)
   {
     _user = user;
     _password = password;
