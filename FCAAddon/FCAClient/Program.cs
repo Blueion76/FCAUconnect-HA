@@ -52,12 +52,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
     AppConfig.UseFakeApi
       ? new FiatClientFake()
       : new FiatClient(AppConfig.FCAUser, AppConfig.FCAPw, AppConfig.Brand, AppConfig.Region);
-  
-DateTime GetLocalTime(long timeStamp)
-{
-    return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
-}
-  
+
   var mqttClient = new SimpleMqttClient(AppConfig.MqttServer,
     AppConfig.MqttPort,
     AppConfig.MqttUser,
@@ -156,11 +151,7 @@ DateTime GetLocalTime(long timeStamp)
                 tmpUnit = "mi";
               }
             }
-           if (detail.Key.EndsWith("_timestamp", StringComparison.InvariantCultureIgnoreCase))
-           {
-               value = GetLocalTime(Convert.ToInt64(detail.Value)).ToString("MM/dd HH:mm:ss");
-               //deviceClass = "duration";
-           }
+
             switch (tmpUnit)
             {
               case "volts":
@@ -206,13 +197,15 @@ DateTime GetLocalTime(long timeStamp)
           Value = DateTime.Now.ToString("O"),
           DeviceClass = "timestamp"
         };
+
+        var localTime = GetLocalTime(vehicle.Location.TimeStamp);
+        Log.Debug($"Location TimeStamp: {localTime}");
         
-        var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice, false)
+        var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice)
         {
-            Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("MM/dd HH:mm:ss"),
+            Value = localTime.ToString("O"),  // ISO 8601 string format
             DeviceClass = "timestamp"
         };
-        
                 
         await lastUpdate.Announce();
         await lastUpdate.PublishState();
@@ -391,4 +384,9 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     locktrunkButton,
     unlocktrunkButton
   };
+}
+
+DateTime GetLocalTime(long timeStamp)
+{
+    return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
 }
