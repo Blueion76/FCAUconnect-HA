@@ -282,6 +282,11 @@ async Task<bool> TrySendCommand(IFiatClient fiatClient, FiatCommand command, str
   return true;
 }
 
+DateTime GetLocalTime(long timeStamp)
+{
+    return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
+}
+
 IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMqttClient mqttClient, Vehicle vehicle,
   HaDevice haDevice)
 {
@@ -389,12 +394,4 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     locktrunkButton,
     unlocktrunkButton
   };
-
-}
-
-DateTime GetLocalTime(long timeStamp)
-{
-    return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
-}
-
 }
