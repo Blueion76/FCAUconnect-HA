@@ -197,11 +197,14 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
           Value = DateTime.Now.ToString("O"),
           DeviceClass = "timestamp"
         };
+
+        var localTime = GetLocalTime(vehicle.Location.TimeStamp);
+        Log.Debug($"Location TimeStamp: {localTime}");
         
         var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice)
         {
-          Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("O"),
-          DeviceClass = "timestamp"
+            Value = localTime.ToString("O"),  // ISO 8601 string format
+            DeviceClass = "timestamp"
         };
                 
         await lastUpdate.Announce();
