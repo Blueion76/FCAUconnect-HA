@@ -52,7 +52,12 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
     AppConfig.UseFakeApi
       ? new FiatClientFake()
       : new FiatClient(AppConfig.FCAUser, AppConfig.FCAPw, AppConfig.Brand, AppConfig.Region);
-
+  
+DateTime GetLocalTime(long timeStamp)
+{
+    return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
+}
+  
   var mqttClient = new SimpleMqttClient(AppConfig.MqttServer,
     AppConfig.MqttPort,
     AppConfig.MqttUser,
@@ -201,11 +206,6 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
           Value = DateTime.Now.ToString("O"),
           DeviceClass = "timestamp"
         };
-        
-        DateTime GetLocalTime(long timeStamp)
-        {
-            return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
-        }
         
         var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice, false)
         {
