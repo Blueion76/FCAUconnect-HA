@@ -2,8 +2,8 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using Cocona;
 using CoordinateSharp;
-using FiatUconnect;
-using FiatUconnect.HA;
+using FCAUconnect;
+using FCAUconnect.HA;
 using Flurl.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +13,7 @@ using Serilog.Events;
 
 var builder = CoconaApp.CreateBuilder();
 
-builder.Configuration.AddEnvironmentVariables("FiatUconnect_");
+builder.Configuration.AddEnvironmentVariables("FCAUconnect_");
 
 builder.Services.AddOptions<AppConfig>()
   .Bind(builder.Configuration)
@@ -48,7 +48,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
 
     FiatClient fiatClient = new FiatClient(appConfig.FiatUser, appConfig.FiatPw, appConfig.Brand, appConfig.Region);
 
-    var mqttClient = new SimpleMqttClient(appConfig.MqttServer, appConfig.MqttPort, appConfig.MqttUser, appConfig.MqttPw, "FiatUconnect");
+    var mqttClient = new SimpleMqttClient(appConfig.MqttServer, appConfig.MqttPort, appConfig.MqttUser, appConfig.MqttPw, "FCAUconnect");
 
     await mqttClient.Connect();
 
