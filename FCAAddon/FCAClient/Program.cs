@@ -51,7 +51,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
   IFiatClient fiatClient =
     AppConfig.UseFakeApi
       ? new FiatClientFake()
-      : new FiatClient(appconfig.FCAUser, appconfig.FCAPw, AppConfig.Brand, AppConfig.Region);
+      : new FiatClient(AppConfig.FCAUser, AppConfig.FCAPw, AppConfig.Brand, AppConfig.Region);
 
   var mqttClient = new SimpleMqttClient(AppConfig.MqttServer,
     AppConfig.MqttPort,
@@ -245,12 +245,12 @@ async Task<bool> TrySendCommand(IFiatClient fiatClient, FiatCommand command, str
 {
   Log.Information("SEND COMMAND {0}: ", command.Message);
 
-  if (string.IsNullOrWhiteSpace(appconfig.FCAPin))
+  if (string.IsNullOrWhiteSpace(AppConfig.FCAPin))
   {
     throw new Exception("PIN NOT SET");
   }
 
-  var pin = appconfig.FCAPin;
+  var pin = AppConfig.FCAPin;
 
   if (command.IsDangerous && !AppConfig.EnableDangerousCommands)
   {
