@@ -1,4 +1,5 @@
 # CHANGELOG
+## 1.0.6 - Fixed API Update / Location Update sensors?
 ## 1.0.5 - Removed Dangerous Commands Option - Options with the flag were not recognizing if set to true.
 ## 1.0.4 - Added Last GPS Update timestamp.
 ## 1.0.3 - Fixed commands. Reverted to FiatChamp as base project. 
