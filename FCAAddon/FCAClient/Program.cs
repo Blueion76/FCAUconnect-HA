@@ -139,7 +139,7 @@ _ = Task.Run(async () =>
     }
 });
 
-async Task<bool> TrySendCommand(fcaClient fcaClient, FCACommand command, string vin)
+async Task<bool> TrySendCommand(FCAClient fcaClient, FCACommand command, string vin)
 {
     Log.Information("SEND COMMAND {0}: ", command.Message);
 
@@ -168,7 +168,7 @@ async Task<bool> TrySendCommand(fcaClient fcaClient, FCACommand command, string 
 
 
 
-IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, fcaClient fcaClient, SimpleMqttClient mqttClient, Vehicle vehicle,
+IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient fcaClient, SimpleMqttClient mqttClient, Vehicle vehicle,
   HaDevice haDevice)
 {
     var updateLocationButton = new HaButton(mqttClient, "UpdateLocation", haDevice, async button =>
