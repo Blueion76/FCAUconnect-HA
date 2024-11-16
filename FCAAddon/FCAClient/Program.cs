@@ -111,7 +111,13 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
           Lon = currentCarLocation.Longitude.ToDouble(),
           StateValue = zones.FirstOrDefault()?.FriendlyName ?? AppConfig.CarUnknownLocation
         };
-
+        
+        var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice)
+        {
+            Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("MM/dd HH:mm:ss"),
+            DeviceClass = "duration"
+        };
+        
         Log.Information("Car is at location: {0}", tracker.Dump());
 
         Log.Debug("Announce sensor: {0}", tracker.Dump());
@@ -192,15 +198,10 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
 
         await Parallel.ForEachAsync(sensors.Values, async (sensor, token) => { await sensor.PublishState(); });
 
-        var lastUpdate = new HaSensor(mqttClient, "Last_API_Update", haDevice)
+        var lastUpdate = new HaSensor(mqttClient, "LAST_API_UPDATE", haDevice)
         {
-          Value = DateTime.Now.ToString("O"),
-          DeviceClass = "timestamp"
-        };
-        var trackerTimeStamp = new HaSensor(mqttClient, "Last_GPS_Update", haDevice)
-        {
-          Value = vehicle.Location.TimeStamp.ToString("O"),
-          DeviceClass = "timestamp"
+          Value = DateTime.Now.ToString("MM/dd HH:mm:ss"),
+          DeviceClass = "duration"
         };
         
         await lastUpdate.Announce();
@@ -380,4 +381,9 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     locktrunkButton,
     unlocktrunkButton
   };
+}
+
+DateTime GetLocalTime(long timeStamp)
+{
+    return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
 }
