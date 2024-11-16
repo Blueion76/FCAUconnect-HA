@@ -27,4 +27,4 @@ export FCAUconnect_AutoDeepInterval=$(bashio::config 'AutoDeepInterval')
 export FCAUconnect_StartDelaySeconds=$(bashio::config 'StartDelaySeconds')
 
 cd /build/
-./FCAClient
+./FCAUconnect-HA
