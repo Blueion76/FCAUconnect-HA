@@ -12,7 +12,7 @@ namespace FCAUconnect;
 
 public enum FcaBrand
 {
-  Fiat,
+  FCA,
   Jeep,
   AlfaRomeo,
   Debug
@@ -171,7 +171,7 @@ public class FCAClient
       .AppendPathSegment("accounts.webSdkBootstrap")
       .SetQueryParam("apiKey", _loginApiKey)
       .WithCookies(_cookieJar)
-      .GetJsonAsync<FiatLoginResponse>();
+      .GetJsonAsync<FCALoginResponse>();
 
     Log.Debug("loginResponse: {0}", loginResponse.Dump());
 
@@ -182,14 +182,14 @@ public class FCAClient
       .AppendPathSegment("accounts.login")
       .WithCookies(_cookieJar)
       .PostUrlEncodedAsync(
-        WithFiatDefaultParameter(new()
+        WithFCADefaultParameter(new()
         {
           { "loginID", _user },
           { "password", _password },
           { "sessionExpiration", TimeSpan.FromMinutes(5).TotalSeconds },
           { "include", "profile,data,emails,subscriptions,preferences" },
         }))
-      .ReceiveJson<FiatAuthResponse>();
+      .ReceiveJson<FCAAuthResponse>();
 
     Log.Debug("authResponse : {0}", authResponse.Dump());
 
@@ -199,13 +199,13 @@ public class FCAClient
       .WithClient(_defaultHttpClient)
       .AppendPathSegment("accounts.getJWT")
       .SetQueryParams(
-        WithFiatDefaultParameter(new()
+        WithFCADefaultParameter(new()
         {
           { "fields", "profile.firstName,profile.lastName,profile.email,country,locale,data.disclaimerCodeGSDP" },
           { "login_token", authResponse.SessionInfo.LoginToken }
         }))
       .WithCookies(_cookieJar)
-      .GetJsonAsync<FiatJwtResponse>();
+      .GetJsonAsync<FCAJwtResponse>();
 
     Log.Debug("jwtResponse : {0}", jwtResponse.Dump());
 
@@ -256,7 +256,7 @@ public class FCAClient
     return dict;
   }
 
-  private Dictionary<string, object> WithFiatDefaultParameter(Dictionary<string, object>? parameters = null)
+  private Dictionary<string, object> WithFCADefaultParameter(Dictionary<string, object>? parameters = null)
   {
     var dict = new Dictionary<string, object>()
     {
