@@ -40,7 +40,7 @@ public class FCALoginResponse : FCAResponse
 public class FCAAuthResponse : FCAResponse
 {
   public string UID { get; set; }
-  public FCASessionInfo SessionInfo { get; set; }
+  public FiatSessionInfo SessionInfo { get; set; }
 }
 
 public class FCAJwtResponse : FCAResponse
