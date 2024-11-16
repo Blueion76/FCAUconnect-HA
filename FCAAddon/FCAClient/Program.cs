@@ -234,7 +234,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient 
         }
     });
 
-    var unLockButton = new HaButton(mqttClient, "DoorUnLock", haDevice, async button =>
+    var unLockButton = new HaButton(mqttClient, "DoorUnlock", haDevice, async button =>
     {
         if (await TrySendCommand(fcaClient, FCACommand.RDU, vehicle.Vin))
         {
