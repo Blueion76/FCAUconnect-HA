@@ -381,17 +381,17 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
 
   return new HaEntity[]
   {
-    UpdateLocation,
-    DeepRefresh,
-    Light,
-    HVAC,
-    StartEngine,
-    StopEngine,
-    DoorLock,
-    DoorUnlock,
-    FetchNow,
-    SuppressAlarm,
-    LockTrunk,
-    UnlockTrunk
+    updateLocationButton,
+    deepRefreshButton,
+    lightsButton,
+    hvacButton,
+    startengineButton,
+    stopengineButton,
+    lockButton,
+    unLockButton,
+    fetchNowButton,
+    suppressalarmButton,
+    locktrunkButton,
+    unlocktrunkButton
   };
 }
