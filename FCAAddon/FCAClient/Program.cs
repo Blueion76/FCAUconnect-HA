@@ -293,11 +293,8 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
   var lightsButton = new HaButton(mqttClient, "Light", haDevice, async button =>
   {
       if (await TrySendCommand(fiatClient, FiatCommand.HBLF, vehicle.Vin))
-      {
           forceLoopResetEvent.Set();
-      }
   });
-
 
   var hvacButton = new HaButton(mqttClient, "HVAC", haDevice, async button =>
   {
