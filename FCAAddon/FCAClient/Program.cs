@@ -46,7 +46,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
     Log.Information("{0}", appConfig.ToStringWithoutSecrets());
     Log.Debug("{0}", appConfig.Dump());
 
-    FCAClient FcaClient = new FCAClient(appConfig.FCAUser, appConfig.FCAPw, appConfig.Brand, appConfig.Region);
+    FCAClient FCAClient = new FCAClient(appConfig.FCAUser, appConfig.FCAPw, appConfig.Brand, appConfig.Region);
 
     var mqttClient = new SimpleMqttClient(appConfig.MqttServer, appConfig.MqttPort, appConfig.MqttUser, appConfig.MqttPw, "FCAUconnect");
 
@@ -60,7 +60,7 @@ _ = Task.Run(async () =>
                 if (!ctx.CancellationToken.IsCancellationRequested && appConfig.AutoDeepRefresh && vinCharging.Any())
                 {
                     Log.Information("AutoDeepRefresh");
-                    foreach(string vin in vinCharging) { await TrySendCommand(FcaClient, FCACommand.DEEPREFRESH, vin); }
+                    foreach(string vin in vinCharging) { await TrySendCommand(FCAClient, FCACommand.DEEPREFRESH, vin); }
                     await Task.Delay(TimeSpan.FromSeconds(6), ctx.CancellationToken);
                     Log.Information("AutoDeepRefresh COMPLETED. Next update in {0} minutes.", appConfig.AutoDeepInterval);
                     forceLoopResetEvent.Set();
@@ -78,9 +78,9 @@ _ = Task.Run(async () =>
 
         try
         {
-            await FcaClient.LoginAndKeepSessionAlive();
+            await FCAClient.LoginAndKeepSessionAlive();
 
-            foreach (var vehicle in await FcaClient.Fetch())
+            foreach (var vehicle in await FCAClient.Fetch())
             {
                 Log.Information($"Found : {vehicle.Nickname} {vehicle.Vin} {vehicle.ModelDescription}");
               
@@ -101,7 +101,7 @@ _ = Task.Run(async () =>
                     await Parallel.ForEachAsync(haEntities, async (sensor, token) => { await sensor.Announce(); });
 
                     Log.Information("Pushing new buttons to Home Assistant");
-                    var haInteractiveEntities = CreateInteractiveEntities(ctx, FcaClient, mqttClient, vehicle, haDevice);
+                    var haInteractiveEntities = CreateInteractiveEntities(ctx, FCAClient, mqttClient, vehicle, haDevice);
                     await Parallel.ForEachAsync(haInteractiveEntities, async (button, token) => { await button.Announce(); });
                 }
 
@@ -139,7 +139,7 @@ _ = Task.Run(async () =>
     }
 });
 
-async Task<bool> TrySendCommand(FCAClient FcaClient, FCACommand command, string vin)
+async Task<bool> TrySendCommand(FCAClient FCAClient, FCACommand command, string vin)
 {
     Log.Information("SEND COMMAND {0}: ", command.Message);
 
@@ -152,7 +152,7 @@ async Task<bool> TrySendCommand(FCAClient FcaClient, FCACommand command, string 
 
     try
     {
-        await FcaClient.SendCommand(vin, command.Message, pin, command.Action);
+        await FCAClient.SendCommand(vin, command.Message, pin, command.Action);
         await Task.Delay(TimeSpan.FromSeconds(5));
         Log.Information("Command: {0} SUCCESSFUL", command.Message);
     }
@@ -168,12 +168,12 @@ async Task<bool> TrySendCommand(FCAClient FcaClient, FCACommand command, string 
 
 
 
-IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient FcaClient, SimpleMqttClient mqttClient, Vehicle vehicle,
+IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient FCAClient, SimpleMqttClient mqttClient, Vehicle vehicle,
   HaDevice haDevice)
 {
     var updateLocationButton = new HaButton(mqttClient, "UpdateLocation", haDevice, async button =>
     {
-        if (await TrySendCommand(FcaClient, FCACommand.VF, vehicle.Vin))
+        if (await TrySendCommand(FCAClient, FCACommand.VF, vehicle.Vin))
         {
             await Task.Delay(TimeSpan.FromSeconds(6), ctx.CancellationToken);
             forceLoopResetEvent.Set();
@@ -184,7 +184,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient 
     {
         if (vinPlugged.Contains(vehicle.Vin))
         {
-            if (await TrySendCommand(FcaClient, FCACommand.DEEPREFRESH, vehicle.Vin))
+            if (await TrySendCommand(FCAClient, FCACommand.DEEPREFRESH, vehicle.Vin))
             {
                 await Task.Delay(TimeSpan.FromSeconds(6), ctx.CancellationToken);
                 forceLoopResetEvent.Set();
@@ -194,7 +194,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient 
 
     var lightsButton = new HaButton(mqttClient, "Light", haDevice, async button =>
     {
-        if (await TrySendCommand(FcaClient, FCACommand.HBLF, vehicle.Vin))
+        if (await TrySendCommand(FCAClient, FCACommand.HBLF, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
@@ -203,7 +203,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient 
 
     var hvacButton = new HaButton(mqttClient, "HVAC", haDevice, async button =>
     {
-        if (await TrySendCommand(FcaClient, FCACommand.ROPRECOND, vehicle.Vin))
+        if (await TrySendCommand(FCAClient, FCACommand.ROPRECOND, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
@@ -211,7 +211,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient 
 
     var startengineButton = new HaButton(mqttClient, "StartEngine", haDevice, async button =>
     {
-        if (await TrySendCommand(FcaClient, FCACommand.REON, vehicle.Vin))
+        if (await TrySendCommand(FCAClient, FCACommand.REON, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
@@ -219,7 +219,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient 
 
     var stopengineButton = new HaButton(mqttClient, "StopEngine", haDevice, async button =>
     {
-        if (await TrySendCommand(FcaClient, FCACommand.REOFF, vehicle.Vin))
+        if (await TrySendCommand(FCAClient, FCACommand.REOFF, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
@@ -228,7 +228,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient 
 
     var lockButton = new HaButton(mqttClient, "DoorLock", haDevice, async button =>
     {
-        if (await TrySendCommand(FcaClient, FCACommand.RDL, vehicle.Vin))
+        if (await TrySendCommand(FCAClient, FCACommand.RDL, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
@@ -236,7 +236,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient 
 
     var unLockButton = new HaButton(mqttClient, "DoorUnLock", haDevice, async button =>
     {
-        if (await TrySendCommand(FcaClient, FCACommand.RDU, vehicle.Vin))
+        if (await TrySendCommand(FCAClient, FCACommand.RDU, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
@@ -250,7 +250,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient 
   
     var suppressalarmButton = new HaButton(mqttClient, "SuppressAlarm", haDevice, async button =>
     {
-        if (await TrySendCommand(FcaClient, FCACommand.TA, vehicle.Vin))
+        if (await TrySendCommand(FCAClient, FCACommand.TA, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
@@ -258,15 +258,15 @@ IEnumerable<HaEntity> CreateInteractiveEntities(CoconaAppContext ctx, FCAClient 
   
     var locktrunkButton = new HaButton(mqttClient, "LockTrunk", haDevice, async button =>
     {
-        if (await TrySendCommand(FcaClient, FCACommand.ROTRUNKLOCK, vehicle.Vin))
+        if (await TrySendCommand(FCAClient, FCACommand.ROTRUNKLOCK, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
     });
 
-    var unlocktrunkButton = new HaButton(mqttClient, "UnLockTrunk", haDevice, async button =>
+    var unlocktrunkButton = new HaButton(mqttClient, "UnlockTrunk", haDevice, async button =>
     {
-        if (await TrySendCommand(FcaClient, FCACommand.ROTRUNKUNLOCK, vehicle.Vin))
+        if (await TrySendCommand(FCAClient, FCACommand.ROTRUNKUNLOCK, vehicle.Vin))
         {
             forceLoopResetEvent.Set();
         }
@@ -286,7 +286,6 @@ async Task<IEnumerable<HaEntity>> GetHaEntities(HaRestApi haClient, SimpleMqttCl
     bool charging = false;
     string charginglevel = "battery_timetofullychargel2";
     string batteryPluginstatus = "battery_pluginstatus";
-    string ignitionStatus = "ignitionstatus";
     
     DateTime refChargeEndTime = DateTime.Now;
 
@@ -304,7 +303,6 @@ async Task<IEnumerable<HaEntity>> GetHaEntities(HaRestApi haClient, SimpleMqttCl
              || detail.Key.Contains("chargetofull", StringComparison.InvariantCultureIgnoreCase)
              || detail.Key.Contains("enablescheduletype", StringComparison.InvariantCultureIgnoreCase)
              || detail.Key.Contains("repeatschedule", StringComparison.InvariantCultureIgnoreCase)
-             || detail.Key.Contains("ignitionstatus", StringComparison.InvariantCultureIgnoreCase)
              )
            {
                binary = true;
