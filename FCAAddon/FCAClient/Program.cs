@@ -151,7 +151,11 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
                 tmpUnit = "mi";
               }
             }
-
+           if (detail.Key.EndsWith("_timestamp", StringComparison.InvariantCultureIgnoreCase))
+           {
+               value = GetLocalTime(Convert.ToInt64(detail.Value)).ToString("MM/dd HH:mm:ss");
+               //deviceClass = "duration";
+           }
             switch (tmpUnit)
             {
               case "volts":
@@ -197,15 +201,18 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
           Value = DateTime.Now.ToString("O"),
           DeviceClass = "timestamp"
         };
-
-        var localTime = GetLocalTime(vehicle.Location.TimeStamp);
-        Log.Debug($"Location TimeStamp: {localTime}");
         
-        var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice)
+        DateTime GetLocalTime(long timeStamp)
         {
-            Value = localTime.ToString("O"),  // ISO 8601 string format
+            return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
+        }
+        
+        var trackerTimeStamp = new HaSensor(mqttClient, "Location_TimeStamp", haDevice, false)
+        {
+            Value = GetLocalTime(vehicle.Location.TimeStamp).ToString("MM/dd HH:mm:ss"),
             DeviceClass = "timestamp"
         };
+        
                 
         await lastUpdate.Announce();
         await lastUpdate.PublishState();
@@ -384,9 +391,4 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     locktrunkButton,
     unlocktrunkButton
   };
-}
-
-DateTime GetLocalTime(long timeStamp)
-{
-    return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();
 }
