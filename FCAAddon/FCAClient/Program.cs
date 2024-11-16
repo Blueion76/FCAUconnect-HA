@@ -26,38 +26,38 @@ builder.Services.AddOptions<AppConfig>()
 var app = builder.Build();
 
 var persistentHaEntities = new ConcurrentDictionary<string, IEnumerable<HaEntity>>();
-var appConfig = builder.Configuration.Get<AppConfig>();
+var AppConfig = builder.Configuration.Get<AppConfig>();
 var forceLoopResetEvent = new AutoResetEvent(false);
-var haClient = new HaRestApi(appConfig.HomeAssistantUrl, appConfig.SupervisorToken);
+var haClient = new HaRestApi(AppConfig.HomeAssistantUrl, AppConfig.SupervisorToken);
 
 Log.Logger = new LoggerConfiguration()
-  .MinimumLevel.Is(appConfig.Debug ? LogEventLevel.Debug : LogEventLevel.Information)
+  .MinimumLevel.Is(AppConfig.Debug ? LogEventLevel.Debug : LogEventLevel.Information)
   .WriteTo.Console()
   .CreateLogger();
 
-Log.Information("Delay start for seconds: {0}", appConfig.StartDelaySeconds);
-await Task.Delay(TimeSpan.FromSeconds(appConfig.StartDelaySeconds));
+Log.Information("Delay start for seconds: {0}", AppConfig.StartDelaySeconds);
+await Task.Delay(TimeSpan.FromSeconds(AppConfig.StartDelaySeconds));
 
-if (appConfig.Brand is FcaBrand.Ram or FcaBrand.Dodge or FcaBrand.AlfaRomeo)
+if (AppConfig.Brand is FcaBrand.Ram or FcaBrand.Dodge or FcaBrand.AlfaRomeo)
 {
-  Log.Warning("{0} support is experimental.", appConfig.Brand);
+  Log.Warning("{0} support is experimental.", AppConfig.Brand);
 }
 
 await app.RunAsync(async (CoconaAppContext ctx) =>
 {
-  Log.Information("{0}", appConfig.ToStringWithoutSecrets());
-  Log.Debug("{0}", appConfig.Dump());
+  Log.Information("{0}", AppConfig.ToStringWithoutSecrets());
+  Log.Debug("{0}", AppConfig.Dump());
 
   IFiatClient fiatClient =
-    appConfig.UseFakeApi
+    AppConfig.UseFakeApi
       ? new FiatClientFake()
-      : new FiatClient(appconfig.FCAUser, appconfig.FCAPw, appConfig.Brand, appConfig.Region);
+      : new FiatClient(appconfig.FCAUser, appconfig.FCAPw, AppConfig.Brand, AppConfig.Region);
 
-  var mqttClient = new SimpleMqttClient(appConfig.MqttServer,
-    appConfig.MqttPort,
-    appConfig.MqttUser,
-    appConfig.MqttPw,
-    appConfig.DevMode ? "FCAUconnectDEV" : "FCAUconnect");
+  var mqttClient = new SimpleMqttClient(AppConfig.MqttServer,
+    AppConfig.MqttPort,
+    AppConfig.MqttUser,
+    AppConfig.MqttPw,
+    AppConfig.DevMode ? "FCAUconnectDEV" : "FCAUconnect");
 
   await mqttClient.Connect();
 
@@ -75,12 +75,12 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
       {
         Log.Information("FOUND CAR: {0}", vehicle.Vin);
 
-        if (appConfig.AutoRefreshBattery)
+        if (AppConfig.AutoRefreshBattery)
         {
           await TrySendCommand(fiatClient, FiatCommand.DEEPREFRESH, vehicle.Vin);
         }
 
-        if (appConfig.AutoRefreshLocation)
+        if (AppConfig.AutoRefreshLocation)
         {
           await TrySendCommand(fiatClient, FiatCommand.VF, vehicle.Vin);
         }
@@ -88,7 +88,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
         await Task.Delay(TimeSpan.FromSeconds(10), ctx.CancellationToken);
 
         var vehicleName = string.IsNullOrEmpty(vehicle.Nickname) ? "Car" : vehicle.Nickname;
-        var suffix = appConfig.DevMode ? "DEV" : "";
+        var suffix = AppConfig.DevMode ? "DEV" : "";
 
         var haDevice = new HaDevice()
         {
@@ -109,7 +109,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
         {
           Lat = currentCarLocation.Latitude.ToDouble(),
           Lon = currentCarLocation.Longitude.ToDouble(),
-          StateValue = zones.FirstOrDefault()?.FriendlyName ?? appConfig.CarUnknownLocation
+          StateValue = zones.FirstOrDefault()?.FriendlyName ?? AppConfig.CarUnknownLocation
         };
 
         Log.Information("Car is at location: {0}", tracker.Dump());
@@ -123,7 +123,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
 
         Log.Information("Using unit system: {0}", unitSystem.Dump());
 
-        var shouldConvertKmToMiles = (appConfig.ConvertKmToMiles || unitSystem.Length != "km");
+        var shouldConvertKmToMiles = (AppConfig.ConvertKmToMiles || unitSystem.Length != "km");
 
         Log.Information("Convert km -> miles ? {0}", shouldConvertKmToMiles);
 
@@ -214,7 +214,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
     catch (FlurlHttpException httpException)
     {
       Log.Warning($"Error connecting to the FIAT API. \n" +
-                  $"This can happen from time to time. Retrying in {appConfig.RefreshInterval} minutes.");
+                  $"This can happen from time to time. Retrying in {AppConfig.RefreshInterval} minutes.");
 
       Log.Debug("ERROR: {0}", httpException.Message);
       Log.Debug("STATUS: {0}", httpException.StatusCode);
@@ -231,13 +231,13 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
       Log.Error("{0}", e);
     }
 
-    Log.Information("Fetching COMPLETED. Next update in {0} minutes.", appConfig.RefreshInterval);
+    Log.Information("Fetching COMPLETED. Next update in {0} minutes.", AppConfig.RefreshInterval);
 
     WaitHandle.WaitAny(new[]
     {
       ctx.CancellationToken.WaitHandle,
       forceLoopResetEvent
-    }, TimeSpan.FromMinutes(appConfig.RefreshInterval));
+    }, TimeSpan.FromMinutes(AppConfig.RefreshInterval));
   }
 });
 
@@ -252,7 +252,7 @@ async Task<bool> TrySendCommand(IFiatClient fiatClient, FiatCommand command, str
 
   var pin = appconfig.FCAPin;
 
-  if (command.IsDangerous && !appConfig.EnableDangerousCommands)
+  if (command.IsDangerous && !AppConfig.EnableDangerousCommands)
   {
     Log.Warning("{0} not sent. " +
                 "Set \"EnableDangerousCommands\" option if you want to use it. ", command.Message);
