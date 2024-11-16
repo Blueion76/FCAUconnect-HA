@@ -6,9 +6,9 @@ Connect your FIAT, Jeep, Ram, Dodge or AlfaRomeo car 🚗 or truck 🚚 to Home 
 
 ## Car Brands
 
-- Fiat: Works ✅
 - Jeep: Works ✅
-- Ram: Experimental ⚠️
+- Fiat: Unknown ⛔
+- Ram: Unknown ⛔
 - Dodge: Unknown ⛔
 - AlfaRomeo: Unknown ⛔
 
@@ -23,7 +23,7 @@ Connect your FIAT, Jeep, Ram, Dodge or AlfaRomeo car 🚗 or truck 🚚 to Home 
 
 ![image](https://user-images.githubusercontent.com/30373916/196045271-44287d3f-93ba-49c0-a72f-0bc92042efbb.png)
 
-Make sure your car works with one of the following Uconnect sites. Older vehicles that only uses mopar.com do not seem to work.
+Make sure your car works with one of the following Uconnect sites. Older vehicles that only use mopar.com do not seem to work.
 
 - Fiat: https://myuconnect.fiat.com/
 - Jeep: https://myuconnect.jeep.com
@@ -61,22 +61,6 @@ Make sure your car works with one of the following Uconnect sites. Older vehicle
 
 - Things the FCA api does not support. Like real time tracking or adjusting the music volume.
 
-## How to install 🛠️
-
-### Home Assistant OS or Supervised
-
-Follow the official docs:
-
-https://www.home-assistant.io/addons/ 
-
-Short version:
-
-- Switch on "Advanced Mode" in your users profile. (if you haven't already)
-- Go to Settings -> Add-ons -> ADD-ON STORE
-- Top right three dots. Add repo. https://github.com/Blueion76/FCAUconnect-HA
-- Top right three dots. Check for updates.
-- Refresh Page. (F5)
-- Store should show this repo now and you can install the addon.
 
 ## Options / Usage
 
