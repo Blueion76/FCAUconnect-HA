@@ -46,7 +46,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
     Log.Information("{0}", appConfig.ToStringWithoutSecrets());
     Log.Debug("{0}", appConfig.Dump());
 
-    FiatClient fiatClient = new FiatClient(appConfig.FiatUser, appConfig.FiatPw, appConfig.Brand, appConfig.Region);
+    FiatClient fiatClient = new FiatClient(appConfig.FCAUser, appConfig.FCAPw, appConfig.Brand, appConfig.Region);
 
     var mqttClient = new SimpleMqttClient(appConfig.MqttServer, appConfig.MqttPort, appConfig.MqttUser, appConfig.MqttPw, "FCAUconnect");
 
@@ -143,12 +143,12 @@ async Task<bool> TrySendCommand(FiatClient fiatClient, FiatCommand command, stri
 {
     Log.Information("SEND COMMAND {0}: ", command.Message);
 
-    if (string.IsNullOrWhiteSpace(appConfig.FiatPin))
+    if (string.IsNullOrWhiteSpace(appConfig.FCAPin))
     {
         throw new Exception("PIN NOT SET");
     }
 
-    var pin = appConfig.FiatPin;
+    var pin = appConfig.FCAPin;
 
     try
     {
