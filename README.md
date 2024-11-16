@@ -6,9 +6,9 @@ Connect your FIAT, Jeep, Ram, Dodge or AlfaRomeo car 🚗 or truck 🚚 to Home 
 
 ## Car Brands
 
-- Fiat: Works ✅
 - Jeep: Works ✅
-- Ram: Experimental ⚠️
+- Fiat: Unknown ⛔
+- Ram: Unknown ⛔
 - Dodge: Unknown ⛔
 - AlfaRomeo: Unknown ⛔
 
