@@ -1,4 +1,5 @@
 # CHANGELOG
+## 1.1.2 - Removed some configuration variables that were not needed to reduce clutter.
 ## 1.1.1 - Added ChargeNow button back.
 ## 1.1.0 - Fixed location / api update sensors
 ## 1.0.6 - Attempt 1: Fixed API Update / Location Update sensors
