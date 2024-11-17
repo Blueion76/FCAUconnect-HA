@@ -9,6 +9,7 @@ public class FiatCommand
   public static readonly FiatCommand ROTRUNKLOCK = new() { Message = "ROTRUNKLOCK" };
   public static readonly FiatCommand ROTRUNKUNLOCK = new() { Message = "ROTRUNKUNLOCK" };
   public static readonly FiatCommand ROPRECOND = new() { Message = "ROPRECOND" };
+  public static readonly FiatCommand CNOW = new() { Action = "ev/chargenow", Message = "CNOW" };
   public static readonly FiatCommand RDU = new() { Message = "RDU" };
   public static readonly FiatCommand RDL = new() { Message = "RDL" };
 
