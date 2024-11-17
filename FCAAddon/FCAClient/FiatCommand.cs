@@ -13,7 +13,6 @@ public class FiatCommand
   public static readonly FiatCommand RDU = new() { Message = "RDU" };
   public static readonly FiatCommand RDL = new() { Message = "RDL" };
 
-  public bool IsDangerous { get; set; }
   public required string Message { get; init; }
   public string Action { get; init; } = "remote";
 }
