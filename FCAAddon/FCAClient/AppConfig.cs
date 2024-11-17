@@ -21,6 +21,8 @@ public record AppConfig
   public int StartDelaySeconds { get; set; } = 1; 
   public bool AutoRefreshLocation { get; set; } = false;
   public bool AutoRefreshBattery { get; set; } = false;
+  public bool EnableDangerousCommands { get; set; } = true;
+  public bool ConvertKmToMiles { get; set; } = false;
   public bool DevMode { get; set; } = false;
   public bool UseFakeApi { get; set; } = false;
   public bool Debug { get; set; } = false;
