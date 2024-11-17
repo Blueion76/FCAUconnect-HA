@@ -40,17 +40,17 @@ Make sure your car works with one of the following Uconnect sites. Older vehicle
 - Home Assistant zones (home 🏠, work 🏦 etc.) support.
 - Uses the same data source as the official app 📱.
 - Remote commands (open doors 🚪, switch air conditioner 🧊 on , ...) Some commands may not work with all cars. Available commands are:
-  - "UpdateLocation" (updates gps location of the car) 
-  - "RefreshBatteryStatus" (refresh battery level %)
-  - "DeepRefresh" (same as "RefreshBatteryStatus")
-  - "Blink" (blink lights)
-  - "ChargeNOW" (starts charging)
+  - "UpdateLocation" (updates GPS location of the car) 
+  - "DeepRefresh" (refresh battery level %) (ev only?)
+  - "Alarm" (trigger vehicle horn and lights)
+  - "ChargeNOW" (starts charging) (ev only)
   - "Trunk" (open/close trunk lock)
   - "DoorLock" (unlock/lock vehicle doors)
   - "HVAC" (turn on the temperature preconditioning in the car)
   - "StartEngine" (remote starts the vehicle engine)
   - "StopEngine" (cancels the remote start request)
   - "SuppressAlarm" (suppresses the vehicle theft alarm)
+  - "UpdateLocation" (updates the vehicle location)
 
 ## What doesn't work (yet)? ❌
 
@@ -84,7 +84,7 @@ At startup the Addon will automatically connect to your Home Assistant MQTT Brok
 
 - PIN is only needed if you want to send commands to your car. Its the same PIN used by the official app or website.
 - Use DEBUG carefully. It will dump many informations to the log including session tokens and sensitive informations.
-- Automatic refresh of location and battery level may drain your battery a bit more. The car have to wakeup some parts, read new values and sent them back. This will get executed every "Refresh interval" and at every command even if your car is not at home. __Recommendation:__  Use a Home Assistant automation instead. I have setup an automation that if the odometer has gone up the car will update it's location/battery status.
-- Mqtt override can be used if you want to utilize an external mqtt broker. __You do not need this if you are using the official Home Assistant mqtt addon.__
+- Automatic refresh of location and battery level may drain your battery a bit more. The car have to wakeup some parts, read new values and sent them back. This will get executed every "Refresh interval" and at every command even if your car is not at home. __Recommendation:__  Use a Home Assistant automation instead. I have setup an automation that if the odometer has gone up the car will update it's location status every 30 seconds till the odometer stays in place.
+- MQTT override can be used if you want to utilize an external MQTT broker. __You do not need this if you are using the official Home Assistant MQTT addon.__
 
 <img src="https://raw.githubusercontent.com/Blueion76/FCAUconnect-HA/refs/heads/master/options.png" width="700px">
