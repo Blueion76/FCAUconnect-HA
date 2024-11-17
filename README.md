@@ -40,7 +40,6 @@ Make sure your car works with one of the following Uconnect sites. Older vehicle
 - Home Assistant zones (home 🏠, work 🏦 etc.) support.
 - Uses the same data source as the official app 📱.
 - Remote commands (open doors 🚪, switch air conditioner 🧊 on , ...) Some commands may not work with all cars. Available commands are:
-  - "UpdateLocation" (updates GPS location of the car) 
   - "DeepRefresh" (refresh battery level %) (ev only?)
   - "Alarm" (trigger vehicle horn and lights)
   - "ChargeNOW" (starts charging) (ev only)
