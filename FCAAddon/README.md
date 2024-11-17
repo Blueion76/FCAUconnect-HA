@@ -1,3 +1,3 @@
 ## Connect your Jeep, Dodge, Fiat (or other FCA vehicle) to Home Assistant
 
-# ![image](https://www.jeep.com/content/dam/fca-brands/na/jeep/en_us/bhp/hero/november-2024/my24-jeep-bhp-hero-eshop-winter-desktop.jpg)
+# ![image](https://github.com/Blueion76/FCAUconnect-HA/blob/master/FCAAddon/docs-stellantis.png?raw=true)
