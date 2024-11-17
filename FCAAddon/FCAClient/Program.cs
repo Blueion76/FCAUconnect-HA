@@ -109,7 +109,7 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
         {
           Lat = currentCarLocation.Latitude.ToDouble(),
           Lon = currentCarLocation.Longitude.ToDouble(),
-          StateValue = zones.FirstOrDefault()?.FriendlyName ?? AppConfig.CarUnknownLocation
+          StateValue = zones.FirstOrDefault()?.FriendlyName ?? "not_home"
         };
         
         Log.Information("Car is at location: {0}", tracker.Dump());
