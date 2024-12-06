@@ -1,4 +1,5 @@
 # CHANGELOG
+## 1.2.3 - Fixed typo in Jeep US auth API Key
 ## 1.2.2 - Updated API keys for various car makes. Fixed AlfaRomeo?
 ## 1.2.1 - Fix Dodge AuthURL. 
 ## 1.2.0 - Fix RAM ApiKey and AuthURL.
