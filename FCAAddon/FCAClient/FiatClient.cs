@@ -299,7 +299,7 @@ public enum FcaRegion
 public class FiatClient : IFiatClient
 {
   private readonly string _loginApiKey = "3_mOx_J2dRgjXYCdyhchv3b5lhi54eBcdCTX4BI8MORqmZCoQWhA0mV2PTlptLGUQI";
-  private readonly string _apiKey = "2wGyL6PHec9o1UeLPYpoYa1SkEWqeBur9bLsi24i";
+  private readonly string _apiKey = "qLYupk65UU1tw2Ih1cJhs4izijgRDbir2UFHA3Je";
   private readonly string _loginUrl = "https://loginmyuconnect.fiat.com";
   private readonly string _tokenUrl = "https://authz.sdpr-01.fcagcv.com/v2/cognito/identity/token";
   private readonly string _apiUrl = "https://channels.sdpr-01.fcagcv.com";
@@ -325,52 +325,52 @@ public class FiatClient : IFiatClient
     _brand = brand;
     _region = region;
 
-    if (_brand == FcaBrand.Ram)
+    if (_brand == FcaBrand.Ram) // Unknown - Updated 12/06/2024
     {
       _loginApiKey = "3_7YjzjoSb7dYtCP5-D6FhPsCciggJFvM14hNPvXN9OsIiV1ujDqa4fNltDJYnHawO";
       _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
       _loginUrl = "https://login-us.ramtrucks.com";
       _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
-      _apiUrl = "https://channels.sdpr-02.fcagcv.com";
-      _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci";
-      _authUrl = "https://mfa.fcl-02.fcagcv.com";
+      _apiUrl = "https://channels.sdpr-02.fcagcv.com"; 
+      _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci"; 
+      _authUrl = "https://mfa.fcl-02.fcagcv.com"; 
       _awsEndpoint = RegionEndpoint.USEast1;
       _locale = "en_us";
     }
-    else if(_brand == FcaBrand.Dodge)
+    else if(_brand == FcaBrand.Dodge) // Unknown - Updated 12/06/2024
     {
-      _loginApiKey = "3_etlYkCXNEhz4_KJVYDqnK1CqxQjvJStJMawBohJU2ch3kp30b0QCJtLCzxJ93N-M";
+      _loginApiKey = "4_dSRvo6ZIpp8_St7BF9VHGA";
       _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
       _loginUrl = "https://login-us.dodge.com";
       _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
       _apiUrl = "https://channels.sdpr-02.fcagcv.com";
-      _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // UNKNOWN
-      _authUrl = "https://mfa.fcl-02.fcagcv.com"; // UNKNOWN
+      _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci"; 
+      _authUrl = "https://mfa.fcl-02.fcagcv.com"; 
       _awsEndpoint = RegionEndpoint.USEast1;
       _locale = "en_us";
     }
-    else if (_brand == FcaBrand.Fiat && _region == FcaRegion.America)
+    else if (_brand == FcaBrand.Fiat && _region == FcaRegion.America) // Unknown - Updated 12/06/2024
     {
-      _loginApiKey = "3_etlYkCXNEhz4_KJVYDqnK1CqxQjvJStJMawBohJU2ch3kp30b0QCJtLCzxJ93N-M";
+      _loginApiKey = "3_WfFvlZJwcSdOD0LFQCngUV3W390R4Yshpuq3RsZvnV4VG0c9Q6R0RtDwcXc8dTrI";
       _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
       _loginUrl = "https://login-us.fiat.com";
       _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
       _apiUrl = "https://channels.sdpr-02.fcagcv.com";
-      _authApiKey = "JWRYW7IYhW9v0RqDghQSx4UcRYRILNmc8zAuh5ys"; // UNKNOWN
-      _authUrl = "https://mfa.fcl-01.fcagcv.com"; // UNKNOWN
+      _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci"; 
+      _authUrl = "https://mfa.fcl-02.fcagcv.com"; 
       _awsEndpoint = RegionEndpoint.USEast1;
       _locale = "en_us";
     }
     else if (_brand == FcaBrand.Jeep)
     {
-      if (_region == FcaRegion.Europe)
+      if (_region == FcaRegion.Europe) // Unknown
       {
         _loginApiKey = "3_ZvJpoiZQ4jT5ACwouBG5D1seGEntHGhlL0JYlZNtj95yERzqpH4fFyIewVMmmK7j";
         _loginUrl = "https://login.jeep.com";
       }
-      else
+      else // working as of 12/06/2024
       {
-        _loginApiKey = "3_5qxvrevRPG7--nEXe6huWdVvF5kV7bmmJcyLdaTJ8A45XUYpaR398QNeHkd7EB1X";
+        _loginApiKey = " 3_5qxvrevRPG7--nEXe6huWdVvF5kV7bmmJcyLdaTJ8A45XUYpaR398QNeHkd7EB1X";
         _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
         _loginUrl = "https://login-us.jeep.com";
         _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
@@ -381,6 +381,27 @@ public class FiatClient : IFiatClient
         _locale = "en_us";
       }
     }
+    else if (_brand == FcaBrand.AlfaRomeo)  // last updated 12/06/2024
+    {
+      if (_region == FcaRegion.Europe)
+      {
+        _loginApiKey = "3_h8sj2VQI-KYXiunPq9a1QuAA4yWkY0r5AD1u8A8B1RPn_Cvl54xcoc2-InH5onJ1";
+        _loginUrl = "https://login.alfaromeo.com";
+      }
+      else
+      {
+        _loginApiKey = "3_FSxGyaktviayTDRcgp9r9o2KjuFSrHT13wWNN9zPrvAGUCoXPDqoIPOwlBUhck4A";
+        _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
+        _loginUrl = "https://login-us.alfaromeo.com";
+        _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
+        _apiUrl = "https://channels.sdpr-02.fcagcv.com";
+        _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci"; 
+        _authUrl = "https://mfa.fcl-02.fcagcv.com"; 
+        _awsEndpoint = RegionEndpoint.USEast1;
+        _locale = "en_us";
+      }
+    }
+    
 
     _defaultHttpClient = new FlurlClient().Configure(settings =>
     {
