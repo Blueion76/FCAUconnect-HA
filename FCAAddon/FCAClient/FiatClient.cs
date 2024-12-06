@@ -370,7 +370,7 @@ public class FiatClient : IFiatClient
       }
       else // working as of 12/06/2024
       {
-        _loginApiKey = " 3_5qxvrevRPG7--nEXe6huWdVvF5kV7bmmJcyLdaTJ8A45XUYpaR398QNeHkd7EB1X";
+        _loginApiKey = "3_5qxvrevRPG7--nEXe6huWdVvF5kV7bmmJcyLdaTJ8A45XUYpaR398QNeHkd7EB1X";
         _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
         _loginUrl = "https://login-us.jeep.com";
         _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
