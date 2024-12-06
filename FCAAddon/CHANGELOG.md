@@ -1,4 +1,5 @@
 # CHANGELOG
+## 1.2.2 - Updated API keys for various car makes. Fixed AlfaRomeo?
 ## 1.2.1 - Fix Dodge AuthURL. 
 ## 1.2.0 - Fix RAM ApiKey and AuthURL.
 ## 1.1.2 - Removed some configuration variables that were not needed to reduce clutter.
