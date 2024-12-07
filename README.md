@@ -1,4 +1,4 @@
-![Uconnect Logo](https://www.driveuconnect.com/content/dam/uconnect/global/header/Uconnect-small.png)
+![Uconnect Logo](https://www.driveuconnect.com/content/dam/uconnect/global/header/Uconnect-small.png) <img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/49/Home_Assistant_logo_%282023%29.svg/2048px-Home_Assistant_logo_%282023%29.svg.png" width="128" height="128"> 
 
 Credit to https://github.com/wubbl0rz/FiatChamp for creating the base addon. Also to https://github.com/altrdev/FiatUconnect and https://github.com/mahil4711/fiat_vehicle_mqtt for resources.
 
@@ -22,9 +22,9 @@ If your vehicle works, please upload it! This will help others tremendously.
 
 ## Prerequisites 📃
 
-- Official Home Assistant MQTT Addon running or an external MQTT broker. Broker must be connected to the Home Assistant MQTT integration.
+<img src="https://raw.githubusercontent.com/Blueion76/FCAUconnect-HA/refs/heads/master/mqtt-logo.png" width="128" height="128"> 
+Official Home Assistant MQTT Addon running or an external MQTT broker. Broker must be connected to the Home Assistant MQTT integration.
 
-![image](https://user-images.githubusercontent.com/30373916/196045271-44287d3f-93ba-49c0-a72f-0bc92042efbb.png)
 
 Make sure your vehicle works with one of the following Uconnect sites. Older vehicles that only use Mopar.com do not work.
 
@@ -91,3 +91,10 @@ At startup the addon will automatically connect to your Home Assistant MQTT Brok
 - MQTT override can be used if you want to utilize an external MQTT broker. __You do not need this if you are using the official Home Assistant MQTT addon.__
 
 <img src="https://raw.githubusercontent.com/Blueion76/FCAUconnect-HA/refs/heads/master/options.png" width="700px">
+
+## Useful Resources
+
+Cards: 
+  - [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card)
+  - [Vehicle Status Card](https://github.com/ngocjohn/vehicle-status-card)
+  
