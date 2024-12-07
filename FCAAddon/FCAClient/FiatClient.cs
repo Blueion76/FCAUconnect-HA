@@ -401,7 +401,18 @@ public class FiatClient : IFiatClient
         _locale = "en_us";
       }
     }
-    
+    else if(_brand == FcaBrand.Chrysler) // Unknown - Updated 12/06/2024
+    {
+      _loginApiKey = "3_cv4AzHkJh48-cqwaf_Ahcg1HnsmQqz1lm0sOdVdHW5FjT3m6SyywywOBaskBQqwn";
+      _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
+      _loginUrl = "https://login-us.chrysler.com";
+      _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
+      _apiUrl = "https://channels.sdpr-02.fcagcv.com";
+      _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci"; 
+      _authUrl = "https://mfa.fcl-02.fcagcv.com"; 
+      _awsEndpoint = RegionEndpoint.USEast1;
+      _locale = "en_us";
+    }
 
     _defaultHttpClient = new FlurlClient().Configure(settings =>
     {
