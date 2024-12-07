@@ -7,11 +7,11 @@ Connect your FCA/Stellantis car 🚗 or truck 🚚 to Home Assistant. Needs a ve
 ## Car Brands
 
 - Jeep: Works ✅
-- Fiat: Unknown ⛔
-- Ram: Unknown ⛔
-- Dodge: Unknown ⛔
+- Fiat: Unknown ❔
+- Ram: Unknown ❔
+- Dodge: Unknown ❔
 - AlfaRomeo: Works ✅
-- Chrysler: Unknown ⛔
+- Chrysler: Unknown ❔
 
 
 ## Tested Vehicles
@@ -22,17 +22,18 @@ If your vehicle works, please upload it! This will help others tremendously.
 
 ## Prerequisites 📃
 
-- Official Home Assistant MQTT Addon (recommended) running or an external MQTT broker. Broker must be connected to the Home Assistant MQTT integration.
+- Official Home Assistant MQTT Addon running or an external MQTT broker. Broker must be connected to the Home Assistant MQTT integration.
 
 ![image](https://user-images.githubusercontent.com/30373916/196045271-44287d3f-93ba-49c0-a72f-0bc92042efbb.png)
 
-Make sure your vehicle works with one of the following Uconnect sites. Older vehicles that only use mopar.com do not seem to work.
+Make sure your vehicle works with one of the following Uconnect sites. Older vehicles that only use Mopar.com do not work.
 
 - Fiat: https://myuconnect.fiat.com/
 - Jeep: https://myuconnect.jeep.com/
 - Ram: https://connect.ramtrucks.com/
 - Dodge: https://connect.dodge.com/
 - AlfaRomeo: https://myalfaconnect.alfaromeo.com/
+- Chrysler: https://connect.chrysler.com/us/en/login/
 
 ## Features ✔️
 
