@@ -21,23 +21,38 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v3
+
     - name: setup
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
+
     - name: build_release
       run: |
         cd FCAAddon/FCAClient
         dotnet publish -r ${{ matrix.rid }} --configuration Release --self-contained -o build/
+
     - name: docker_login
       uses: docker/login-action@v2.0.0
       with:
         registry: ghcr.io
-        username: altrdev #${{ github.repository_owner }}
+        username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
+
     - name: create_image
       uses: home-assistant/builder@master
       with:
         args: |
-          --${{ matrix.arch }} \
+          --platform ${{ matrix.arch }} \
           --target FCAAddon
+
+    - name: tag_image
+      run: |
+        # Use a unique image name for your fork
+        docker tag ghcr.io/${{ github.repository_owner }}/FCAUconnect-HA:latest ghcr.io/${{ github.repository_owner }}/FCAUconnect-HA:${{ matrix.arch }}-${{ github.sha }}
+
+    - name: push_image
+      run: |
+        # Push both the latest tag and architecture-specific tags to GHCR
+        docker push ghcr.io/${{ github.repository_owner }}/FCAUconnect-HA:${{ matrix.arch }}-${{ github.sha }}
+        docker push ghcr.io/${{ github.repository_owner }}/FCAUconnect-HA:latest
