@@ -287,6 +287,7 @@ public enum FcaBrand
   Ram,
   Jeep,
   Dodge,
+  Chrysler,
   AlfaRomeo
 }
 
