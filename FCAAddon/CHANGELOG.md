@@ -1,4 +1,5 @@
 # CHANGELOG
+## 1.3.1 - Add initial support for Maserati
 ## 1.3.0 - Add initial support for Asia and Canada region accounts
 ## 1.2.4 - Add Chrysler Support. Unknown if working
 ## 1.2.3 - Fixed typo in Jeep US auth API Key
