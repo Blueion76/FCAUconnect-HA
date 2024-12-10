@@ -288,7 +288,8 @@ public enum FcaBrand
   Jeep,
   Dodge,
   Chrysler,
-  AlfaRomeo
+  AlfaRomeo,
+  Maserati
 }
 
 public enum FcaRegion
@@ -461,7 +462,32 @@ public class FiatClient : IFiatClient
         _locale = "en_us";
       }
     }
-    
+    else if (_brand == FcaBrand.Maserati) // Unknown - Updated 12/10/2024
+    {
+      if (_region == FcaRegion.Europe) // Unknown
+      {
+        _loginApiKey = "3_rNbVuhn2gIt3BnLjlGsJcMo26Lft3avDne_FLRT34Dy_9OxHtCVOnplwY436lGZa";
+        _loginUrl = "https://login.maserati.com";
+      }
+      if (_region == FcaRegion.Asia) // Unknown
+      {
+        _loginApiKey = "4_uwF-in6KF-aMbEkPAb-fOg";
+        _loginUrl = "https://accounts.au1.gigya.com";
+      }
+      else // America/Canada
+      {
+        _loginApiKey = "3_nShL4-O7IL0OGqroO8AzwiRU0-ZHcBZ4TLBrh5MORusMo5XYxhCLXPYfjI4OOLOy";
+        _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
+        _loginUrl = "https://login-us.maserati.com";
+        _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
+        _apiUrl = "https://channels.sdpr-02.fcagcv.com";
+        _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci"; 
+        _authUrl = "https://mfa.fcl-02.fcagcv.com"; 
+        _awsEndpoint = RegionEndpoint.USEast1;
+        _locale = "en_us";
+      }
+    }
+
     _defaultHttpClient = new FlurlClient().Configure(settings =>
     {
       settings.HttpClientFactory = new PollyHttpClientFactory();
