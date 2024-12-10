@@ -82,6 +82,37 @@ Short version:
 - Refresh Page. (F5)
 - Store should show this repo now and you can install the addon.
 
+### Standalone Docker Container
+
+When using Home Assistant as a self managed Docker container you can use FCAUConnect in standalone mode. You need to update the container yourself and export all the needed environment variables. __This is for advanced users only.__
+The supervisor token can be generated on the user profile page inside Home Assistant (Long-Lived Access Token).
+
+Docker Compose example:
+
+``` yaml
+version: "3.9"                                                                                                                                     
+services:
+  FCAUconnect:
+    image: ghcr.io/blueion76/image-amd64-fca-uconnect:latest 
+    container_name: FCAUconnect
+    environment:
+      - 'STANDALONE=True'
+      - 'FCAUconnect_FCAUser=youruconnectemail'
+      - 'FCAUconnect_FCAPw=youruconnectpassword'
+      - 'FCAUconnect_FCAPin=1234'
+      - 'FCAUconnect_SupervisorToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI5NGFmMGJhZTFjYTQ0ODk2YWEzYjgzMGI5YmE4NGQxNiIsImlhdCI6MTY3MDA3Mjc'
+      - 'FCAUconnect_StartDelaySeconds=2'
+      - 'FCAUconnect_Region=America' // Can be America, Europe, Asia or Canada
+      - 'FCAUconnect_Brand=Jeep' // Can be Jeep, Fiat, Chrysler, Maserati, AlfaRomeo, Ram, or Dodge
+      - 'FCAUconnect_MqttUser=yourmqttserverusername'
+      - 'FCAUconnect_MqttPw=yourmqttserverpassword'
+      - 'FCAUconnect_MqttServer=172.16.1.28'
+      - 'FCAUconnect_MqttPort=1883'
+      - 'FCAUconnect_Debug=true' // Can be set to false if not needed
+      - 'FCAUconnect_RefreshInterval=2'
+      - 'FCAUconnect_AutoDeepRefresh=false'
+      - 'FCAUconnect_HomeAssistantUrl=http://172.16.3.2:8123'
+```
 ## Options / Usage
 
 At startup the addon will automatically connect to your Home Assistant MQTT Broker. You can configure your own MQTT server in the configuration.
