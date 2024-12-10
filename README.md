@@ -39,7 +39,7 @@ Make sure your vehicle works with one of the following Uconnect sites. Older veh
 ## Features ✔️
 
 - Imports statistics like battery level 🔋, tire pressure ‍💨, odometer ⏲ etc. into Home Assistant.
-- Multiple Brands: Fiat, Jeep, Ram, Dodge, AlfaRomeo
+- Multiple Brands: Fiat, Jeep, Ram, Dodge, AlfaRomeo, Chrysler & Maserati
 - Supports multiple cars on the same account. 🚙🚗🚕
 - Location tracking.🌍
 - Home Assistant zones (home 🏠, work 🏦 etc.) support.
