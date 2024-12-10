@@ -3,7 +3,7 @@ url: "https://github.com/Blueion76/FCAUconnect-HA"
 description: "Uconnect Home Assistant Addon for FCA vehicles (Jeep, Dodge, AlfaRomeo etc.)"
 services:
     - "mqtt:want"
-version: "1.3.0"
+version: "1.3.1"
 homeassistant_api: true
 image: "ghcr.io/blueion76/image-{arch}-fca-uconnect"
 slug: "fca_uconnect"
@@ -23,7 +23,7 @@ schema:
   FCAUser: str
   FCAPw: password
   FCAPin: password?
-  Brand: list(Fiat|Ram|Jeep|Dodge|AlfaRomeo|Chrysler)
+  Brand: list(Fiat|Ram|Jeep|Dodge|AlfaRomeo|Chrysler|Maserati)
   Region: list(Europe|America|Canada|Asia)
   RefreshInterval: int
   Debug: bool
