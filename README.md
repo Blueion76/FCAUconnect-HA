@@ -12,7 +12,7 @@ Connect your FCA/Stellantis car 🚗 or truck 🚚 to Home Assistant. Needs a ve
 - Dodge: Unknown ❔
 - AlfaRomeo: Works ✅
 - Chrysler: Unknown ❔
-
+- Maserati: Unknown ❔
 
 ## Tested Vehicles
 
