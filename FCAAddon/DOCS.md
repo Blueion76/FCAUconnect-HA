@@ -33,7 +33,7 @@ Make sure your vehicle works with one of the following Uconnect sites. Older veh
 - Ram: https://connect.ramtrucks.com/
 - Dodge: https://connect.dodge.com/
 - AlfaRomeo: https://myalfaconnect.alfaromeo.com/
-- Chrysler: https://connect.chrysler.com/us/en/login/
+- Chrysler: https://connect.chrysler.com/choose-country
 
 ## Features ✔️
 
