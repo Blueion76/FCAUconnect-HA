@@ -12,7 +12,7 @@ Connect your FCA/Stellantis car 🚗 or truck 🚚 to Home Assistant. Needs a ve
 - Dodge: Unknown ❔
 - AlfaRomeo: Works ✅
 - Chrysler: Unknown ❔
-
+- Maserati: Unknown ❔
 
 ## Tested Vehicles
 
@@ -34,6 +34,7 @@ Make sure your vehicle works with one of the following Uconnect sites. Older veh
 - Dodge: https://connect.dodge.com/
 - AlfaRomeo: https://myalfaconnect.alfaromeo.com/
 - Chrysler: https://connect.chrysler.com/choose-country
+- Maserati: https://connect.maserati.com/
 
 ## Features ✔️
 
