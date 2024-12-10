@@ -24,7 +24,7 @@ schema:
   FCAPw: password
   FCAPin: password?
   Brand: list(Fiat|Ram|Jeep|Dodge|AlfaRomeo|Chrysler)
-  Region: list(Europe|America)
+  Region: list(Europe|America|Canada|Asia)
   RefreshInterval: int
   Debug: bool
   AutoRefreshBattery: bool
