@@ -545,7 +545,7 @@ public class FiatClient : IFiatClient
           { "loginID", _user },
           { "password", _password },
           { "sessionExpiration", TimeSpan.FromMinutes(5).TotalSeconds },
-          { "include", "profile,data,emails,subscriptions,preferences" },
+          { "include", "profile,data" },
         }))
       .ReceiveJson<FiatAuthResponse>();
 
