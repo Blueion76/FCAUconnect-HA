@@ -412,7 +412,19 @@ public class FiatClient : IFiatClient
     }
     else if (_brand == FcaBrand.AlfaRomeo)  // last updated 12/10/2024
     {
-      if (_region == FcaRegion.America || _region == FcaRegion.Canada)
+      if (_region == FcaRegion.America)
+      {
+        _loginApiKey = "3_FSxGyaktviayTDRcgp9r9o2KjuFSrHT13wWNN9zPrvAGUCoXPDqoIPOwlBUhck4A";
+        _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
+        _loginUrl = "https://login-us.alfaromeo.com";
+        _tokenUrl = "https://authz.sdpr-02.fcagcv.com/v2/cognito/identity/token";
+        _apiUrl = "https://channels.sdpr-02.fcagcv.com";
+        _authApiKey = "fNQO6NjR1N6W0E5A6sTzR3YY4JGbuPv48Nj9aZci"; 
+        _authUrl = "https://mfa.fcl-02.fcagcv.com"; 
+        _awsEndpoint = RegionEndpoint.USEast1;
+        _locale = "en_us";
+      }
+      if (_region == FcaRegion.Canada)
       {
         _loginApiKey = "3_FSxGyaktviayTDRcgp9r9o2KjuFSrHT13wWNN9zPrvAGUCoXPDqoIPOwlBUhck4A";
         _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
