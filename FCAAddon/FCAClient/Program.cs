@@ -294,7 +294,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
 
   var deepRefreshButton = new HaButton(mqttClient, "DeepRefresh", haDevice, async button =>
   {
-      if (await TrySendCommand(fiatClient, FiatCommand.ROPRECOND, vehicle.Vin))
+      if (await TrySendCommand(fiatClient, FiatCommand.DEEPREFRESH, vehicle.Vin))
       {
           forceLoopResetEvent.Set();
       }
