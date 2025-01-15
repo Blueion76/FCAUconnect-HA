@@ -1,4 +1,6 @@
 # CHANGELOG
+## 1.3.4 - Fixed DeepRefresh command code typo.
+## 1.3.3 - Bug fixes
 ## 1.3.2 - Attempt to fix AlfaRomeo US based accounts
 ## 1.3.1 - Add initial support for Maserati
 ## 1.3.0 - Add initial support for Asia and Canada region accounts
