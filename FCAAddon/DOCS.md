@@ -7,8 +7,8 @@ Connect your FCA/Stellantis car 🚗 or truck 🚚 to Home Assistant. Needs a ve
 ## Car Brands
 
 - Jeep: Works ✅
-- Fiat: Unknown ❔
-- Ram: Unknown ❔
+- Fiat: Experimental ⚠️
+- Ram: Works ✅
 - Dodge: Unknown ❔
 - AlfaRomeo: Experimental ⚠️
 - Chrysler: Experimental ⚠️
