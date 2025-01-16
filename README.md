@@ -26,7 +26,7 @@ If your vehicle works, please upload it! This will help others tremendously.
 Official Home Assistant MQTT Addon running or an external MQTT broker. Broker must be connected to the Home Assistant MQTT integration.
 
 
-Make sure your vehicle works with one of the following Uconnect sites. Older vehicles that only use Mopar.com do not work.
+Make sure your vehicle works with one of the following Uconnect sites. Older vehicles that only use Mopar.com (SiriusXM Guardian) do not work.
 
 - Fiat: https://myuconnect.fiat.com/
 - Jeep: https://myuconnect.jeep.com/
