@@ -1,4 +1,6 @@
 # CHANGELOG
+
+## 1.3.5 - Added new commands (Liftgate Lock/Unlock, Comfort On/Off, Preconditioning Off, HVAC On/Off & Lights) *note some commands may not work with all vehicles.
 ## 1.3.4 - Fixed DeepRefresh command code typo.
 ## 1.3.3 - Bug fixes
 ## 1.3.2 - Attempt to fix AlfaRomeo US based accounts
