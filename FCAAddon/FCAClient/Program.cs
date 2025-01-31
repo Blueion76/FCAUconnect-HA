@@ -182,6 +182,19 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
           timeToFullyChargeSensor.Unit = "min";
         }
 
+        if (sensors.TryGetValue("oilLevel", out var oilLevelSensor))
+        {
+          oilLevelSensor.Unit = "%";
+          if (vehicle.Details["vehicleInfo"]?["oilLevel"] != null)
+          {
+              var oilLevelValue = vehicle.Details["vehicleInfo"]["oilLevel"]?.Value<int>(); // Assuming oil level is an integer value
+              if (oilLevelValue.HasValue)
+              {
+                  oilLevelSensor.Value = $"{oilLevelValue.Value}%";
+              }
+          }
+        }
+
         Log.Debug("Announce sensors: {0}", sensors.Dump());
         Log.Information("Pushing new sensors and values to Home Assistant");
 
@@ -280,7 +293,11 @@ async Task<bool> TrySendCommand(IFiatClient fiatClient, FiatCommand command, str
 
   return true;
 }
+/* 
 
+Create Buttons inside Home Assistant
+
+*/
 IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMqttClient mqttClient, Vehicle vehicle,
   HaDevice haDevice)
 {
@@ -291,7 +308,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
           forceLoopResetEvent.Set();
       }
   });
-
+  
   var deepRefreshButton = new HaButton(mqttClient, "DeepRefresh", haDevice, async button =>
   {
       if (await TrySendCommand(fiatClient, FiatCommand.DEEPREFRESH, vehicle.Vin))
@@ -308,9 +325,17 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
       }
   });
 
-  var hvacButton = new HaButton(mqttClient, "HVAC", haDevice, async button =>
+  var hvacButton = new HaButton(mqttClient, "PreconditioningOn", haDevice, async button =>
   {
       if (await TrySendCommand(fiatClient, FiatCommand.ROPRECOND, vehicle.Vin))
+      {
+          forceLoopResetEvent.Set();
+      }
+  });
+
+  var hvacButton = new HaButton(mqttClient, "PreconditioningOff", haDevice, async button =>
+  {
+      if (await TrySendCommand(fiatClient, FiatCommand.ROPRECOND_OFF, vehicle.Vin))
       {
           forceLoopResetEvent.Set();
       }
@@ -387,6 +412,62 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     }
 });
 
+  var lockLiftgateButton = new HaButton(mqttClient, "LockLiftgate", haDevice, async button =>
+{
+    if (await TrySendCommand(fiatClient, FiatCommand.ROLIFTGATELOCK, vehicle.Vin))
+    {
+        forceLoopResetEvent.Set();
+    }
+});
+
+  var unlockLiftgateButton = new HaButton(mqttClient, "UnlockLiftgate", haDevice, async button =>
+{
+    if (await TrySendCommand(fiatClient, FiatCommand.ROLIFTGATEUNLOCK, vehicle.Vin))
+    {
+        forceLoopResetEvent.Set();
+    }
+});
+
+  var comfortOnButton = new HaButton(mqttClient, "ComfortOn", haDevice, async button =>
+{
+    if (await TrySendCommand(fiatClient, FiatCommand.ROCOMFORTON, vehicle.Vin))
+    {
+        forceLoopResetEvent.Set();
+    }
+});
+
+  var comfortOffButton = new HaButton(mqttClient, "ComfortOff", haDevice, async button =>
+{
+    if (await TrySendCommand(fiatClient, FiatCommand.ROCOMFORTOFF, vehicle.Vin))
+    {
+        forceLoopResetEvent.Set();
+    }
+});
+
+  var hvacOffButton = new HaButton(mqttClient, "HVACOff", haDevice, async button =>
+{
+    if (await TrySendCommand(fiatClient, FiatCommand.ROHVACOFF, vehicle.Vin))
+    {
+        forceLoopResetEvent.Set();
+    }
+});
+
+  var hvacOnButton = new HaButton(mqttClient, "HVACOn", haDevice, async button =>
+{
+    if (await TrySendCommand(fiatClient, FiatCommand.ROHVACON, vehicle.Vin))
+    {
+        forceLoopResetEvent.Set();
+    }
+});
+
+  var lightsButton = new HaButton(mqttClient, "Lights", haDevice, async button =>
+{
+    if (await TrySendCommand(fiatClient, FiatCommand.ROLIGHTS, vehicle.Vin))
+    {
+        forceLoopResetEvent.Set();
+    }
+});
+
 
   return new HaEntity[]
   {
@@ -405,7 +486,11 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     chargeNowButton
   };
 }
+/* 
 
+Get Current Time
+
+*/
 DateTime GetLocalTime(long timeStamp)
 {
     return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToLocalTime();

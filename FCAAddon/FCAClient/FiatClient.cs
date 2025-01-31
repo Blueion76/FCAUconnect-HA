@@ -329,7 +329,7 @@ public class FiatClient : IFiatClient
     _brand = brand;
     _region = region;
 
-    if (_brand == FcaBrand.Ram) // Unknown - Updated 12/10/2024 - Should cover all regions
+    if (_brand == FcaBrand.Ram) // working as of 01/31/2025
     {
       _loginApiKey = "3_7YjzjoSb7dYtCP5-D6FhPsCciggJFvM14hNPvXN9OsIiV1ujDqa4fNltDJYnHawO";
       _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
@@ -341,7 +341,7 @@ public class FiatClient : IFiatClient
       _awsEndpoint = RegionEndpoint.USEast1;
       _locale = "en_us";
     }
-    else if (_brand == FcaBrand.Dodge) // Unknown - Updated 12/10/2024 - Should cover all regions
+    else if (_brand == FcaBrand.Dodge) // working as of 01/31/2025
     {
       _loginApiKey = "4_dSRvo6ZIpp8_St7BF9VHGA";
       _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
@@ -353,14 +353,14 @@ public class FiatClient : IFiatClient
       _awsEndpoint = RegionEndpoint.USEast1;
       _locale = "en_us";
     }
-    else if (_brand == FcaBrand.Fiat) // Unknown - Updated 12/10/2024
+    else if (_brand == FcaBrand.Fiat) // working as of 01/31/2025
     {
-      if (_region == FcaRegion.Asia) // Unknown
+      if (_region == FcaRegion.Asia) 
       {
         _loginApiKey = "4_YAQNaPqdPEUbbzhvhunKAA";
         _loginUrl = "https://login-iap.fiat.com";
       }
-      if (_region == FcaRegion.Canada) // Unknown
+      if (_region == FcaRegion.Canada) 
       {
         _loginApiKey = "3_Ii2kSgQm4ljy19LIZeLwa76OlmWbpSa8w3aSP5VJdx19tub3oWxsFR-HEusDnUEh";
         _apiKey = "2rVctWlJz47M1GsL7o9ph2RPCqAzf57r7nYtdK1B";
@@ -372,7 +372,7 @@ public class FiatClient : IFiatClient
         _awsEndpoint = RegionEndpoint.USEast1;
         _locale = "en_us";
       }
-      if (_region == FcaRegion.America) // Unknown
+      if (_region == FcaRegion.America)
       {
         _loginApiKey = "3_WfFvlZJwcSdOD0LFQCngUV3W390R4Yshpuq3RsZvnV4VG0c9Q6R0RtDwcXc8dTrI";
         _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
@@ -385,19 +385,19 @@ public class FiatClient : IFiatClient
         _locale = "en_us";
       }
     }
-    else if (_brand == FcaBrand.Jeep) // Last Updated 12/10/2024
+    else if (_brand == FcaBrand.Jeep) // working as of 01/31/2025
     {
-      if (_region == FcaRegion.Asia) // Unknown
+      if (_region == FcaRegion.Asia) 
       {
         _loginApiKey = "4_zqGYHC7rM8RCHHl4YFDebA";
         _loginUrl = "https://login-iap.jeep.com";
       }
-      if (_region == FcaRegion.Europe) // Unknown
+      if (_region == FcaRegion.Europe) 
       {
         _loginApiKey = "3_ZvJpoiZQ4jT5ACwouBG5D1seGEntHGhlL0JYlZNtj95yERzqpH4fFyIewVMmmK7j";
         _loginUrl = "https://login.jeep.com";
       }
-      else // working as of 12/10/2024 - United States/Canada
+      else // United States/Canada
       {
         _loginApiKey = "3_5qxvrevRPG7--nEXe6huWdVvF5kV7bmmJcyLdaTJ8A45XUYpaR398QNeHkd7EB1X";
         _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
@@ -410,7 +410,7 @@ public class FiatClient : IFiatClient
         _locale = "en_us";
       }
     }
-    else if (_brand == FcaBrand.AlfaRomeo)  // last updated 12/10/2024
+    else if (_brand == FcaBrand.AlfaRomeo)  // Working as of 01/31/2025
     {
       if (_region == FcaRegion.America || _region == FcaRegion.Canada)
       {
@@ -424,7 +424,7 @@ public class FiatClient : IFiatClient
         _awsEndpoint = RegionEndpoint.USEast1;
         _locale = "en_us";
       }
-      if (_region == FcaRegion.Asia) // Unknown
+      if (_region == FcaRegion.Asia) 
       {
         _loginApiKey = "4_PSQeADnQ4p5XOaDgT0B5pA";
         _loginUrl = "https://login-iap.alfaromeo.com";
@@ -435,9 +435,9 @@ public class FiatClient : IFiatClient
         _loginUrl = "https://login.alfaromeo.com";
       }
     }
-    else if (_brand == FcaBrand.Chrysler) // Unknown - Updated 12/10/2024
+    else if (_brand == FcaBrand.Chrysler) // working as of 01/31/2025
     {
-      if (_region == FcaRegion.Canada) // Unknown
+      if (_region == FcaRegion.Canada) 
       {
         _loginApiKey = "3_gdhu-ur4jc2hEryDMnF4YPELkjzSi-invZTjop4isZu4ReHodVcuL44u93cOUqMC";
         _apiKey = "OgNqp2eAv84oZvMrXPIzP8mR8a6d9bVm1aaH9LqU";
@@ -462,14 +462,14 @@ public class FiatClient : IFiatClient
         _locale = "en_us";
       }
     }
-    else if (_brand == FcaBrand.Maserati) // Unknown - Updated 12/10/2024
+    else if (_brand == FcaBrand.Maserati) // working as of 01/31/2025
     {
-      if (_region == FcaRegion.Europe) // Unknown
+      if (_region == FcaRegion.Europe) 
       {
         _loginApiKey = "3_rNbVuhn2gIt3BnLjlGsJcMo26Lft3avDne_FLRT34Dy_9OxHtCVOnplwY436lGZa";
         _loginUrl = "https://login.maserati.com";
       }
-      if (_region == FcaRegion.Asia) // Unknown
+      if (_region == FcaRegion.Asia) 
       {
         _loginApiKey = "4_uwF-in6KF-aMbEkPAb-fOg";
         _loginUrl = "https://accounts.au1.gigya.com";
