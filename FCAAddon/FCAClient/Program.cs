@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+/using System.Collections.Concurrent;
 using System.Globalization;
 using Cocona;
 using CoordinateSharp;
@@ -180,19 +180,6 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
         {
           timeToFullyChargeSensor.DeviceClass = "duration";
           timeToFullyChargeSensor.Unit = "min";
-        }
-
-        if (sensors.TryGetValue("oilLevel", out var oilLevelSensor))
-        {
-          oilLevelSensor.Unit = "%";
-          if (vehicle.Details["vehicleInfo"]?["oilLevel"] != null)
-          {
-              var oilLevelValue = vehicle.Details["vehicleInfo"]["oilLevel"]?.Value<int>(); // Assuming oil level is an integer value
-              if (oilLevelValue.HasValue)
-              {
-                  oilLevelSensor.Value = $"{oilLevelValue.Value}%";
-              }
-          }
         }
 
         Log.Debug("Announce sensors: {0}", sensors.Dump());
