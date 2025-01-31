@@ -325,7 +325,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
       }
   });
 
-  var hvacButton = new HaButton(mqttClient, "PreconditioningOn", haDevice, async button =>
+  var preconditioningOnButton = new HaButton(mqttClient, "PreconditioningOn", haDevice, async button =>
   {
       if (await TrySendCommand(fiatClient, FiatCommand.ROPRECOND, vehicle.Vin))
       {
@@ -333,7 +333,7 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
       }
   });
 
-  var hvacButton = new HaButton(mqttClient, "PreconditioningOff", haDevice, async button =>
+  var preconditioningOffButton = new HaButton(mqttClient, "PreconditioningOff", haDevice, async button =>
   {
       if (await TrySendCommand(fiatClient, FiatCommand.ROPRECOND_OFF, vehicle.Vin))
       {
@@ -474,7 +474,8 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     updateLocationButton,
     deepRefreshButton,
     alarmButton,
-    hvacButton,
+    preconditioningOnButton,
+    preconditioningOffButton,
     startEngineButton,
     stopEngineButton,
     lockDoorsButton,
@@ -483,7 +484,14 @@ IEnumerable<HaEntity> CreateInteractiveEntities(IFiatClient fiatClient, SimpleMq
     suppressAlarmButton,
     lockTrunkButton,
     unlockTrunkButton,
-    chargeNowButton
+    chargeNowButton,
+    lockLiftgateButton,
+    unlockLiftgateButton,
+    comfortOnButton,
+    comfortOffButton,
+    hvacOffButton,
+    hvacOnButton,
+    lightsButton
   };
 }
 /* 
