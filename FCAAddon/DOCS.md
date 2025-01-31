@@ -44,26 +44,32 @@ Make sure your vehicle works with one of the following Uconnect sites. Older veh
 - Location tracking.🌍
 - Home Assistant zones (home 🏠, work 🏦 etc.) support.
 - Uses the same data source as the official app 📱.
-- Remote commands (unlock doors 🚪, switch air conditioner 🧊 on , ...) Some commands may not work with all cars. Available commands are:
-  - "DeepRefresh" (refresh battery level %) (ev only?)
+- Remote commands (unlock doors 🚪, switch air conditioner 🧊 on , ...) Some commands may not work with all cars.
+- Available commands are:
+  - "UpdateLocation" (updates the vehicle location)
+  - "DeepRefresh" (refresh battery level %) (ev only)
   - "Alarm" (trigger vehicle horn and lights)
-  - "ChargeNOW" (starts charging) (ev only)
-  - "Trunk" (open/close trunk lock)
+  - "PreconditioningOn/Off" (I believe this triggers/stops HVAC on some vehicles)
+  - "TrunkLock/LiftgateLock" (lock/unlock trunk) (your vehicle may not use one or either)
   - "DoorLock" (unlock/lock vehicle doors)
-  - "HVAC" (starts the HVAC in the car)
+  - "HVAC" (starts/stops the HVAC on some vehicles)
   - "StartEngine" (remote starts the vehicle engine)
   - "StopEngine" (cancels the remote start request)
   - "SuppressAlarm" (suppresses the vehicle theft alarm)
-  - "UpdateLocation" (updates the vehicle location)
-
+  - "FetchNow" (useful for Home Assistant automations to update the API)
+  - "ChargeNow" (ev only - charges the vehicle)
+  - "Lights" (I believe this toggles the vehicles headlights on/off, haven't tested)
+  - "Comfort" (another alternative to the other HVAC options- I have no idea why FCA uses multiple commands across vehicles)
+ 
 ## What doesn't work (yet)? ❌
 
-- Eco Reports (statistics). I could not find any API yet. The official app shows it so in theory it should be accessible.
-- Live Vehicle Status. Some users report that you can find the engine/lock status but I haven't been able to replicate this on my 2024 Wagoneer L. Feel free to submit a PR if you find a way.
+- Live Vehicle Status. Some vehicles report live vehicle status for things like the locks, my vehicle does not so I'm currently unable to test/code this in. Feel free to submit a PR if you have a compatible vehicle.
+- Notification Reporting. The official site and app shows notifications indicating a successful command. I'm not sure how to code this in. Feel free to submit a PR if you find a way.
 
 ## What will NEVER work? ❌
 
 - Things the FCA API does not support such as real time tracking or adjusting the audio volume.
+- Some commands are vehicle specific and do not work across all makes and models. 
 
 ## How to install 🛠️
 
@@ -100,26 +106,26 @@ services:
       - 'FCAUconnect_FCAUser=youruconnectemail'
       - 'FCAUconnect_FCAPw=youruconnectpassword'
       - 'FCAUconnect_FCAPin=1234'
-      - 'FCAUconnect_SupervisorToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI5NGFmMGJhZTFjYTQ0ODk2YWEzYjgzMGI5YmE4NGQxNiIsImlhdCI6MTY3MDA3Mjc'
+      - 'FCAUconnect_SupervisorToken=xxxxxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
       - 'FCAUconnect_StartDelaySeconds=2'
       - 'FCAUconnect_Region=America' # Can be America, Europe, Asia or Canada
       - 'FCAUconnect_Brand=Jeep' # Can be Jeep, Fiat, Chrysler, Maserati, AlfaRomeo, Ram, or Dodge
       - 'FCAUconnect_MqttUser=yourmqttserverusername'
       - 'FCAUconnect_MqttPw=yourmqttserverpassword'
-      - 'FCAUconnect_MqttServer=172.16.1.28'
+      - 'FCAUconnect_MqttServer=192.168.1.2'
       - 'FCAUconnect_MqttPort=1883'
       - 'FCAUconnect_Debug=true' # Can be set to false if not needed
       - 'FCAUconnect_RefreshInterval=2'
       - 'FCAUconnect_AutoDeepRefresh=false'
-      - 'FCAUconnect_HomeAssistantUrl=http://172.16.3.2:8123'
+      - 'FCAUconnect_HomeAssistantUrl=http://192.168.1.3:8123'
 ```
 ## Options / Usage
 
 At startup the addon will automatically connect to your Home Assistant MQTT Broker. You can configure your own MQTT server in the configuration.
 
-- PIN is only needed if you want to send commands to your car. Its the same PIN you set for the official app/website.
+- PIN is only needed if you want to send commands to your car. It's the same PIN you set for the official vehicle branded app.
 - Use DEBUG carefully. It will dump sensitive information to the log including session tokens.
-- Automatic refresh of location and battery level may drain your battery more. The car has to wakeup some parts, read new values and send them back to the API. This will get executed every "Refresh interval" and at every command even if your car is not at home. __Recommendation:__  Use a Home Assistant automation instead. I have setup an automation that if the odometer has gone up the car will update it's location status every 30 seconds till the odometer stays in place. Then it will change to every 3 hours.
+- Automatic refresh of location and battery level may drain your battery more. The car has to wakeup its computers, read new values and send them back to the API. This will get executed every "Refresh interval" and at every command even if your car is not at home. __Recommendation:__  Use a Home Assistant automation instead. I have setup an automation that if the odometer has gone up the car will update it's location status every 30 seconds till the odometer stays in place. Then it will change to every 3 hours.
 - MQTT override can be used if you want to utilize an external MQTT broker. __You do not need this if you are using the official Home Assistant MQTT addon.__
 
 <img src="https://raw.githubusercontent.com/Blueion76/FCAUconnect-HA/refs/heads/master/options.png" width="700px">
