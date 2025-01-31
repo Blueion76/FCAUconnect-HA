@@ -42,5 +42,3 @@ Second attempt at fixing vehicle commands. Changed US Login API Key.
 First attempt at fixing vehicle commands.
 ## 1.0.0 
 Initial Release. Added engine on/off and alarm functionality. 
-
-
