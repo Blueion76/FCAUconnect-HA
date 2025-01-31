@@ -2,22 +2,16 @@
 configuration:
   FCAUser:
     name: Login user
-    description: Your FCA Uconnect user email.
+    description: Your vehicle branded FCA user email.
   FCAPw:
     name: Password
-    description: Your FCA Uconnect password.
+    description: Your vehicle branded FCA password.
   FCAPin:
     name: Pin
     description: Your PIN used for sending commands to the car.
-  CarUnknownLocation:
-    name: Car unknown location status
-    description: Sets the car location status if in an unknown location.
   StartDelaySeconds:
     name: Start delay in seconds
     description: Delay the start of the addon. Useful if you want to wait for other addons to start first (like slow MQTT startup).
-  ConvertKmToMiles:
-    name: Force convert KM to MI
-    description: Not needed if your Home Assistant config is set to imperial system. Try to force convert kilometer values to miles.
   Brand:
     name: Brand
     description: Choose your car make.
@@ -30,9 +24,6 @@ configuration:
   Debug:
     name: Debug
     description: Enable debug logging. Sensitive information may be shown!
-  EnableDangerousCommands:
-    name: Dangerous commands
-    description: Enable commands that are potentially dangerous and/or experimental. Like unlocking doors or remote start.
   AutoRefreshBattery:
     name: Force refresh battery status
     description: Automatic update battery status every refresh interval. This will consume more battery power.
