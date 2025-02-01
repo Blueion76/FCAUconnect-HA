@@ -714,7 +714,7 @@ public class FiatClient : IFiatClient
         .AppendPathSegments("v1", "accounts", userUid, "vehicles", vehicle.Vin, "remote", "status")
         .WithHeaders(WithAwsDefaultParameter(_apiKey))
         .AwsSign(awsCredentials, _awsEndpoint)
-        .GetJsonAsync<JObject>();
+        .GetJsonAsync<VehicleStatus>();
     
       vehicle.Status = vehicleStatus;
 
