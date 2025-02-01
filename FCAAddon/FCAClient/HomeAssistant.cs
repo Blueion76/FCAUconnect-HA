@@ -222,8 +222,9 @@ public class HaSensor : HaEntity
     var deviceClassJson =
       string.IsNullOrWhiteSpace(this.DeviceClass) ? "" : $"\"device_class\":\"{this.DeviceClass}\"," ;
     var iconJson =
-      string.IsNullOrWhiteSpace(this.DeviceClass) ? $"\"icon\":\"{this.Icon}\"," : "" ;
-
+      string.IsNullOrWhiteSpace(this.Icon) ? $"\"icon\":\"{this.Icon}\"," : "" ;
+    var friendlyNameJson =
+      string.IsNullOrWhiteSpace(this.FriendlyName) ? $"\"name\":\"{_name}\"," : $"\"name\":\"{this.FriendlyName}\",";
     await _mqttClient.Pub(_configTopic, $$""" 
     {
       "device":{
