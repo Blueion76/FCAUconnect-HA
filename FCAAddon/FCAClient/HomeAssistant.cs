@@ -195,6 +195,7 @@ public class HaSensor : HaEntity
   public string Icon { get; set; } = "mdi:eye";
   public string Unit { get; set; } = "";
   public string DeviceClass { get; set; } = "";
+  public string FriendlyName { get; set; } = "";
   
   private readonly string _stateTopic;
   private readonly string _configTopic;
@@ -203,6 +204,9 @@ public class HaSensor : HaEntity
   {
     _stateTopic = $"homeassistant/sensor/{_id}/state";
     _configTopic = $"homeassistant/sensor/{_id}/config";
+
+  this.FriendlyName = string.IsNullOrWhiteSpace(friendlyName) ? name : friendlyName;
+  this.Icon = icon;
   }
 
   public override async Task PublishState()
@@ -227,8 +231,9 @@ public class HaSensor : HaEntity
         "manufacturer":"{{ _haDevice.Manufacturer }}", 
         "model":"{{ _haDevice.Model }}",
         "name":"{{ _haDevice.Name }}",
-        "sw_version":"{{ _haDevice.Version }}"},
-      "name":"{{ _name }}",
+        "sw_version":"{{ _haDevice.Version }}"
+      },
+      {{ friendlyNameJson }}
       {{ unitOfMeasurementJson }}
       {{ deviceClassJson }}
       {{ iconJson }}
