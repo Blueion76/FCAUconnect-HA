@@ -118,6 +118,7 @@ public class Vehicle
   public string EvRunningStatus { get; set; }
   [JsonIgnore] public JObject Details { get; set; }
   [JsonIgnore] public VehicleLocation Location { get; set; }
+  [JsonIgnore] public VehicleStatus Status { get; set; }
 }
 
 public class VehicleLocation
