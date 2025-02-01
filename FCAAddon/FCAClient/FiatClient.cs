@@ -708,6 +708,17 @@ public class FiatClient : IFiatClient
       vehicle.Location = vehicleLocation;
 
       Log.Debug("{0}", vehicleLocation.Dump());
+
+      var vehicleStatus = await _apiUrl
+        .WithClient(_defaultHttpClient)
+        .AppendPathSegments("v1", "accounts", userUid, "vehicles", vehicle.Vin, "remote", "status")
+        .WithHeaders(WithAwsDefaultParameter(_apiKey))
+        .AwsSign(awsCredentials, _awsEndpoint)
+        .GetJsonAsync<VehicleStatus>();
+    
+      vehicle.Status = vehicleStatus;
+
+      Log.Debug("{0}", vehicleStatus.Dump());
     }
 
     return vehicleResponse.Vehicles;
