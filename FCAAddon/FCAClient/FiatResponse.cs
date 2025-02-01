@@ -130,6 +130,19 @@ public class VehicleLocation
   public bool? IsLocationApprox { get; set; }
 }
 
+public class VehicleStatus
+{
+  public long TimeStamp { get; set; }
+  public Dictionary<string, DoorStatus> Doors { get; set; }
+  public string EvRunning { get; set; }
+  public string TrunkStatus { get; set; }
+}
+
+public class DoorStatus
+{
+  public string Status { get; set; }
+}
+
 public class Battery
 {
   public long StateOfCharge { get; set; }
