@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: 
-      - master
+      - testing
 
 jobs:
   build:
@@ -41,3 +41,7 @@ jobs:
         args: |
           --${{ matrix.arch }} \
           --target FCAAddon
+    - name: publish_to_testing
+      run: |
+        docker tag image-amd64-fca-uconnect ghcr.io/${{ github.repository_owner }}/image-amd64-fca-uconnect:testing
+        docker push ghcr.io/${{ github.repository_owner }}/image-amd64-fca-uconnect:testing
