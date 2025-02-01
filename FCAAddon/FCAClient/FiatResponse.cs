@@ -115,6 +115,7 @@ public class Vehicle
   public string SoldRegion { get; set; }
   [JsonIgnore] public JObject Details { get; set; }
   [JsonIgnore] public VehicleLocation Location { get; set; }
+  [JsonIgnore] public VehicleStatus Status { get; set; }
 }
 
 public class VehicleLocation
@@ -125,6 +126,19 @@ public class VehicleLocation
   public double? Altitude { get; set; }
   public object? Bearing { get; set; }
   public bool? IsLocationApprox { get; set; }
+}
+
+public class VehicleStatus
+{
+  public long TimeStamp { get; set; }
+  public Dictionary<string, DoorStatus> Doors { get; set; }
+  public string EvRunning { get; set; }
+  public string TrunkStatus { get; set; }
+}
+
+public class DoorStatus
+{
+  public string Status { get; set; }
 }
 
 public class Battery
