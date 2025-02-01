@@ -127,7 +127,9 @@ await app.RunAsync(async (CoconaAppContext ctx) =>
 
         Log.Information("Convert km -> miles ? {0}", shouldConvertKmToMiles);
 
-        var sensors = compactDetails.Select(detail =>
+        var sensors = compactDetails
+          .Where(detail => !string.IsNullOrEmpty(detail.Value))  // Filters out null values
+          .Select(detail =>
         {
           var sensor = new HaSensor(mqttClient, detail.Key, haDevice)
           {
