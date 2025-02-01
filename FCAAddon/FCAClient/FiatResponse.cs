@@ -113,9 +113,6 @@ public class Vehicle
   public string Make { get; set; }
   public string BrandCode { get; set; }
   public string SoldRegion { get; set; }
-  public Dictionary<string, string> DoorLocks { get; set; }
-  public string TrunkStatus { get; set; }
-  public string EvRunningStatus { get; set; }
   [JsonIgnore] public JObject Details { get; set; }
   [JsonIgnore] public VehicleLocation Location { get; set; }
   [JsonIgnore] public VehicleStatus Status { get; set; }
