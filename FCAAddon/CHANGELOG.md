@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## This addon has been discontinued. Please migrate to https://github.com/hass-uconnect/hass-uconnect when free. 
+
+
+
 ## 1.3.5
 Added new commands (Liftgate Lock/Unlock, Comfort On/Off, Preconditioning Off, HVAC On/Off & Lights) *note some commands may not work with all vehicles.
 ## 1.3.4
