@@ -1,3 +1,12 @@
+## NOTICE
+
+**This addon has been discontinued in favor of: https://github.com/hass-uconnect/hass-uconnect**
+
+
+---------------------------------
+
+
+
 ![Uconnect Logo](https://www.driveuconnect.com/content/dam/uconnect/global/header/Uconnect-small.png) <img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/49/Home_Assistant_logo_%282023%29.svg/2048px-Home_Assistant_logo_%282023%29.svg.png" width="128" height="128"> 
 
 Credit to https://github.com/wubbl0rz/FiatChamp for creating the base addon. Also to https://github.com/altrdev/FiatUconnect and https://github.com/mahil4711/fiat_vehicle_mqtt for resources.
